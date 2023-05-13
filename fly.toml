@@ -1,7 +1,8 @@
-app = "samstodin-subs-27d7"
+app = "samstodin-subs"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
+primary_region = lhr
 
 [experimental]
 allowed_public_ports = [ ]
