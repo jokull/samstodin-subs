@@ -31,6 +31,7 @@
     "@remix-run/react": "^1.16.0",
     "@remix-run/serve": "^1.16.0",
     "@zodios/core": "^10.9.0",
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "isbot": "^3.6.8",
     "react": "^18.2.0",

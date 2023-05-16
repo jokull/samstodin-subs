@@ -22,6 +22,7 @@ specifiers:
   '@vitest/coverage-c8': ^0.30.1
   '@zodios/core': ^10.9.0
   autoprefixer: ^10.4.14
+  axios: ^1.4.0
   bcryptjs: ^2.4.3
   binode: ^1.0.5
   c8: ^7.13.0
@@ -61,7 +62,8 @@ dependencies:
   '@remix-run/node': 1.16.0
   '@remix-run/react': 1.16.0_biqbaboplfbrettd7655fr4n2y
   '@remix-run/serve': 1.16.0
-  '@zodios/core': 10.9.0_zod@3.21.4
+  '@zodios/core': 10.9.0_axios@1.4.0+zod@3.21.4
+  axios: 1.4.0
   bcryptjs: 2.4.3
   isbot: 3.6.10
   react: 18.2.0
@@ -2864,12 +2866,13 @@ packages:
       zod: 3.21.4
     dev: true
 
-  /@zodios/core/10.9.0_zod@3.21.4:
+  /@zodios/core/10.9.0_axios@1.4.0+zod@3.21.4:
     resolution: {integrity: sha512-vfj1vbVuA+S7sRX7nSzkW4cf35R1AFFHHYfCb1rUdEHWlBrc7YLjbjoQiijHEVloCX97TtuVrzSYCU0yu8bmrQ==}
     peerDependencies:
       axios: ^0.x || ^1.0.0
       zod: ^3.x
     dependencies:
+      axios: 1.4.0
       zod: 3.21.4
     dev: false
 
@@ -3132,7 +3135,6 @@ packages:
 
   /asynckit/0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
-    dev: true
 
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
@@ -3189,6 +3191,16 @@ packages:
     transitivePeerDependencies:
       - debug
     dev: true
+
+  /axios/1.4.0:
+    resolution: {integrity: sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /axobject-query/3.1.1:
     resolution: {integrity: sha512-goKlv8DZrK9hUh975fnHzhNIO4jUnFCfv/dszV5VwUGDFjI6vQ2VwoyjYjYNEbBE8AH87TduWP5uyDR1D+Iteg==}
@@ -3670,7 +3682,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
-    dev: true
 
   /comma-separated-tokens/2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
@@ -4058,7 +4069,6 @@ packages:
   /delayed-stream/1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
-    dev: true
 
   /depd/2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
@@ -5082,7 +5092,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
 
   /follow-redirects/1.15.2_debug@4.3.4:
     resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
@@ -5129,7 +5138,6 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
-    dev: true
 
   /format/0.2.2:
     resolution: {integrity: sha512-wzsgA6WOq+09wrU1tsJ09udeR/YZRaeArL9e1wPbFg3GG2yDnC2ldKpxs4xunpFF9DgqCqOIra3bc1HWrJ37Ww==}
