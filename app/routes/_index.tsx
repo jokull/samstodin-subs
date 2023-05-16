@@ -2,9 +2,8 @@ import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import { useRef } from "react";
-import type { z } from "zod";
-import type { schemas } from "~/askell";
-import { createApiClient } from "~/askell";
+import type { Subscription } from "~/api";
+import { getApi } from "~/api";
 
 import { getUser } from "~/session.server";
 import { useOptionalUser } from "~/utils";
@@ -32,16 +31,6 @@ function getApexDomain(hostname: string) {
   }
 
   return domainParts.slice(-2).join(".");
-}
-
-type Subscription = z.infer<typeof schemas.Subscription>;
-
-function getApi() {
-  return createApiClient("https://askell.is/api", {
-    axiosConfig: {
-      headers: { Authorization: `Api-Key ${process.env.ASKELL_PRIVATE ?? ""}` },
-    },
-  });
 }
 
 export async function action({ request }: ActionArgs) {
