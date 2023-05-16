@@ -1,5 +1,5 @@
 import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
-import { createCookie, json, redirect } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import { useRef } from "react";
 import type { z } from "zod";
@@ -78,6 +78,23 @@ export async function action({ request }: ActionArgs) {
   }
 }
 
+function getAskriftCookieValue(domain: string, value: string) {
+  // Get the current date
+  let date = new Date();
+
+  // Set it to one year in the future
+  date.setFullYear(date.getFullYear() + 1);
+
+  // Format the date string in the correct format
+  let dateString = date.toUTCString();
+
+  // Generate the Set-Cookie header
+  let header = `askrift=${value}; Expires=${dateString}; Domain=${domain}; Path=/; SameSite=Lax;`;
+
+  // Return the header
+  return header;
+}
+
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request);
   const askell = getApi();
@@ -94,17 +111,17 @@ export const loader = async ({ request }: LoaderArgs) => {
     subscription = subscriptions.find(({ active }) => active) ?? null;
   }
 
+  const cookieDomain = `.${getApexDomain(
+    process.env.EXTERNAL_HOST ?? "localhost"
+  )}`;
+
   return json(
     { plans, user, subscription },
     {
       headers: user
         ? {
-            "Set-Cookie": await createCookie("user", {
-              sameSite: "lax",
-              domain: `.${getApexDomain(
-                process.env.EXTERNAL_HOST ?? "localhost"
-              )}`,
-            }).serialize(
+            "Set-Cookie": getAskriftCookieValue(
+              cookieDomain,
               JSON.stringify({
                 email: user.email,
                 hasSubscription: !!subscription,
@@ -122,7 +139,7 @@ export default function AskriftirPage() {
   const subRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex h-full min-h-screen flex-col">
+    <div className="flex h-full min-h-screen max-w-2xl mx-auto flex-col">
       <header className="flex w-full items-center justify-between gap-4 p-4 text-black">
         <div className="flex flex-col sm:flex-row sm:gap-4 sm:items-center">
           <a
@@ -186,7 +203,7 @@ export default function AskriftirPage() {
                 })}
               </p>
             ) : null}
-            <p>
+            <>
               <a
                 className="underline"
                 target="_blank"
@@ -207,7 +224,7 @@ export default function AskriftirPage() {
                 />
                 <button className="underline">segja upp áskrift</button>
               </Form>
-            </p>
+            </>
           </div>
         ) : (
           <div>
