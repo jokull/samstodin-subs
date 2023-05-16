@@ -65,7 +65,7 @@ export const meta: V2_MetaFunction = () => [
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/notes";
+  const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData<typeof action>();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -80,7 +80,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-full flex-col justify-center">
-      <div className="mx-auto w-full max-w-md px-8">
+      <div className="mx-auto w-full max-w-md px-4">
         <Form method="post" className="space-y-6">
           <Logo />
           <div>
@@ -160,8 +160,8 @@ export default function LoginPage() {
                 Muna eftir mér
               </label>
             </div>
-            <div className="text-center text-sm text-gray-500">
-              Ekki með aðgang?{" "}
+            <div className="text-right text-sm text-gray-500">
+              <span className="hidden sm:inline">Ekki með aðgang? </span>
               <Link
                 className="text-blue-500 underline"
                 to={{
