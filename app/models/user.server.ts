@@ -12,13 +12,21 @@ export async function getUserById(id: User["id"]) {
 export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });
 }
+export async function getUserByKennitala(kennitala: User["kennitala"]) {
+  return prisma.user.findUnique({ where: { kennitala } });
+}
 
-export async function createUser(email: User["email"], password: string) {
+export async function createUser(
+  email: User["email"],
+  password: string,
+  kennitala: string
+) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return prisma.user.create({
     data: {
       email,
+      kennitala,
       password: {
         create: {
           hash: hashedPassword,

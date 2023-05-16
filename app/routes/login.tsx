@@ -2,6 +2,7 @@ import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef } from "react";
+import { Logo } from "~/components/Logo";
 
 import { verifyLogin } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
@@ -58,7 +59,9 @@ export const action = async ({ request }: ActionArgs) => {
   });
 };
 
-export const meta: V2_MetaFunction = () => [{ title: "Login" }];
+export const meta: V2_MetaFunction = () => [
+  { title: "Innskráning - Samstöðin" },
+];
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
@@ -79,12 +82,13 @@ export default function LoginPage() {
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
         <Form method="post" className="space-y-6">
+          <Logo />
           <div>
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
-              Email address
+              Netfang
             </label>
             <div className="mt-1">
               <input
@@ -112,7 +116,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
             >
-              Password
+              Lykilorð
             </label>
             <div className="mt-1">
               <input
@@ -136,9 +140,9 @@ export default function LoginPage() {
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <button
             type="submit"
-            className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
+            className="w-full rounded bg-neutral-950 px-4 py-2 text-white hover:bg-black focus:bg-neutral-900"
           >
-            Log in
+            Innskrá
           </button>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -146,17 +150,18 @@ export default function LoginPage() {
                 id="remember"
                 name="remember"
                 type="checkbox"
+                defaultChecked
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <label
                 htmlFor="remember"
                 className="ml-2 block text-sm text-gray-900"
               >
-                Remember me
+                Muna eftir mér
               </label>
             </div>
             <div className="text-center text-sm text-gray-500">
-              Don't have an account?{" "}
+              Ekki með aðgang?{" "}
               <Link
                 className="text-blue-500 underline"
                 to={{
@@ -164,7 +169,7 @@ export default function LoginPage() {
                   search: searchParams.toString(),
                 }}
               >
-                Sign up
+                Stofna aðgang
               </Link>
             </div>
           </div>
