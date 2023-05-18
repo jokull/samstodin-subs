@@ -7,7 +7,7 @@ import {
   useLoaderData,
   useSearchParams,
 } from "@remix-run/react";
-import { sealData } from "iron-session/edge";
+
 import { useEffect, useRef, useState } from "react";
 import { getApi } from "~/api";
 import { Logo } from "~/components/Logo";
@@ -16,11 +16,8 @@ import { isValidKennitala } from "~/kennitala";
 import { getUserByEmail, getUserByKennitala } from "~/models/user.server";
 import { sendEmail } from "~/samstodin";
 import { getUserId } from "~/session.server";
-import {
-  formatCurrencyIcelandic,
-  normalizeEmail,
-  validateEmail,
-} from "~/utils";
+import { getToken } from "~/tokens.server";
+import { formatCurrencyIcelandic, validateEmail } from "~/utils";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const userId = await getUserId(request);
@@ -40,8 +37,17 @@ export const action = async ({ request }: ActionArgs) => {
   const name = formData.get("name");
   const subscriptionId = formData.get("subscriptionId");
 
-  if (typeof name !== "string") {
-    throw new Error("Name is not string");
+  if (typeof name !== "string" || name.length < 1) {
+    return json(
+      {
+        errors: {
+          email: null,
+          kennitala: null,
+          name: "Nafn vantar",
+        },
+      },
+      { status: 400 }
+    );
   }
 
   if (typeof subscriptionId !== "string") {
@@ -54,6 +60,7 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           email: "Netfang lítur ekki út fyrir að vera rétt skrifað",
           kennitala: null,
+          name: null,
         },
       },
       { status: 400 }
@@ -66,6 +73,7 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           kennitala: "Þetta er ekki gild kennitala",
           email: null,
+          name: null,
         },
       },
       { status: 400 }
@@ -79,6 +87,7 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           kennitala: null,
           email: "Notandi með þetta netfang er nú þegar með aðgang",
+          name: null,
         },
       },
       { status: 400 }
@@ -92,27 +101,26 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           kennitala: "Notandi með þessa kennitölu er nú þegar með aðgang",
           email: null,
+          name: null,
         },
       },
       { status: 400 }
     );
   }
 
-  const token = await sealData(
-    {
-      email: normalizeEmail(email),
-      kennitala,
-      althydufelagid,
-      name,
-      subscriptionId,
-    },
-    { password: process.env.SESSION_SECRET ?? "", ttl: 15 * 60 }
-  );
+  const token = await getToken({
+    email,
+    kennitala,
+    althydufelagid,
+    name,
+    subscriptionId,
+  });
   const tokenUrl = `https://${process.env.EXTERNAL_HOST}/stadfesta?token=${token}`;
-  console.log({ value: tokenUrl });
 
   if (process.env.EXTERNAL_HOST !== "samstodin-subs.solberg.is") {
     await sendEmail(email, "Staðfestu skráningu", tokenUrl);
+  } else {
+    console.debug({ tokenUrl });
   }
 
   return redirect("/stadfesting");
@@ -126,6 +134,7 @@ export default function Askrift() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const emailRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   const kennitalaRef = useRef<HTMLInputElement>(null);
   const [subscriptionId, setSubscriptionId] = useState(data.plans[1].id ?? 0);
 
@@ -134,21 +143,14 @@ export default function Askrift() {
       emailRef.current?.focus();
     } else if (actionData?.errors?.kennitala) {
       kennitalaRef.current?.focus();
+    } else if (actionData?.errors?.name) {
+      nameRef.current?.focus();
     }
   }, [actionData]);
 
-  useEffect(() => {
-    console.log("🧠");
-  }, []);
-
   return (
     <div className="flex min-h-full flex-col justify-center">
-      <div
-        className="mx-auto w-full max-w-xl px-4"
-        onClick={(event) => {
-          console.log({ event, hey: "hey" });
-        }}
-      >
+      <div className="mx-auto w-full max-w-xl px-4">
         <Form method="post" className="space-y-6">
           <Logo />
           <div className="space-y-4 mb-8">
@@ -186,6 +188,33 @@ export default function Askrift() {
               {actionData?.errors?.email ? (
                 <div className="pt-1 text-red-700" id="email-error">
                   {actionData.errors.email}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Fullt nafn
+            </label>
+            <div className="mt-1">
+              <input
+                ref={nameRef}
+                id="name"
+                required
+                autoFocus={true}
+                name="name"
+                autoComplete="name"
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-describedby="name-error"
+                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              />
+              {actionData?.errors?.name ? (
+                <div className="pt-1 text-red-700" id="name-error">
+                  {actionData.errors.name}
                 </div>
               ) : null}
             </div>
@@ -240,15 +269,12 @@ export default function Askrift() {
               <button
                 type="button"
                 onClick={(event) => {
-                  console.log({ id, event });
                   event.preventDefault();
                   setSubscriptionId(id!);
                 }}
                 key={id}
-                className={`rounded-md border-[1.5px] border-black px-4 pt-2 pb-1.5 hover:-translate-y-1 hover:shadow-lg hover:scale-105 shadow-black/5 transition-transform ${
-                  subscriptionId === id
-                    ? "bg-black text-white"
-                    : "font-black bg-white"
+                className={`rounded-md font-black border-[1.5px] border-black px-4 pt-2 pb-1.5 hover:-translate-y-1 hover:shadow-lg hover:scale-105 shadow-black/5 transition-transform ${
+                  subscriptionId === id ? "bg-black text-white" : "bg-white"
                 }`}
               >
                 {formatCurrencyIcelandic(amount!)}

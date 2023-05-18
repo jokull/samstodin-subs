@@ -1,37 +1,27 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { unsealData } from "iron-session/edge";
-import { z } from "zod";
+
 import { Logo } from "~/components/Logo";
 import { createUser } from "~/models/user.server";
 import { createUserSession } from "~/session.server";
+import { getTokenData } from "~/tokens.server";
 
-const schema = z.object({
-  email: z.string(),
-  kennitala: z.string(),
-  althydufelagid: z.boolean(),
-  name: z.string(),
-  subscriptionId: z.string(),
-});
-
-function getFormData(request: Request) {
+function getTokenDataFromRequest(request: Request) {
   const externalDomain = process.env.EXTERNAL_HOST ?? "localhost";
   const url = new URL(request.url, `https://${externalDomain}/`);
   const token = url.searchParams.get("token") ?? "";
-  return schema.safeParse(
-    unsealData(token, { password: process.env.SESSION_SECRET ?? "" })
-  );
+  return getTokenData(token);
 }
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const result = getFormData(request);
+  const result = await getTokenDataFromRequest(request);
 
   if (!result.success) {
     return new Response("Error", { status: 403 });
   }
 
-  return json(result.data, {});
+  return json(result.data);
 };
 
 export const action = async ({ request }: ActionArgs) => {
@@ -64,7 +54,7 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
-  const result = getFormData(request);
+  const result = await getTokenDataFromRequest(request);
 
   if (!result.success) {
     throw new Error("Not valid form data");
@@ -113,7 +103,7 @@ export default function Stadfesta() {
               <input
                 id="email"
                 readOnly
-                value={data}
+                defaultValue={data.email}
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
               />
             </div>
