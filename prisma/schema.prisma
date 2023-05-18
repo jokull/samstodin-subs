@@ -9,13 +9,15 @@ generator client {
 
 model User {
   id    String @id @default(cuid())
+  name  String @default("")
   email String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  password  Password?
-  kennitala String    @unique @default("")
+  password       Password?
+  kennitala      String    @unique @default("")
+  althydufelagid Boolean   @default(true)
 }
 
 model Password {

@@ -19,7 +19,7 @@ export const action = async ({ request }: ActionArgs) => {
   const email = formData.get("email");
   const password = formData.get("password");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
-  const remember = formData.get("remember");
+  // const remember = formData.get("remember");
 
   if (!validateEmail(email)) {
     return json(
@@ -53,7 +53,8 @@ export const action = async ({ request }: ActionArgs) => {
 
   return createUserSession({
     redirectTo,
-    remember: remember === "on" ? true : false,
+    // remember: remember === "on" ? true : false,
+    remember: true,
     request,
     userId: user.id,
   });
@@ -146,7 +147,7 @@ export default function LoginPage() {
           </button>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <input
+              {/* <input
                 id="remember"
                 name="remember"
                 type="checkbox"
@@ -158,14 +159,14 @@ export default function LoginPage() {
                 className="ml-2 block text-sm text-gray-900"
               >
                 Muna eftir mér
-              </label>
+              </label> */}
             </div>
             <div className="text-right text-sm text-gray-500">
               <span className="hidden sm:inline">Ekki með aðgang? </span>
               <Link
                 className="text-blue-500 underline"
                 to={{
-                  pathname: "/join",
+                  pathname: "/askrift",
                   search: searchParams.toString(),
                 }}
               >

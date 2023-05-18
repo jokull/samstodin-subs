@@ -69,3 +69,44 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+export function normalizeEmail(value: string) {
+  const email = value.toLowerCase().trim();
+  const emailParts = email.split(/@/);
+
+  if (emailParts.length !== 2) {
+    return email;
+  }
+
+  let username = emailParts[0] as string;
+  const domain = emailParts[1] as string;
+
+  if (["gmail.com", "fastmail.com", "googlemail.com"].includes(domain)) {
+    username = username.replace(".", "");
+  }
+
+  return username + "@" + domain;
+}
+
+export function formatCurrencyIcelandic(input: string): string {
+  const numberValue = parseFloat(input);
+
+  const formatter = new Intl.NumberFormat("is-IS", {
+    style: "currency",
+    currency: "ISK",
+    currencyDisplay: "narrowSymbol",
+    maximumFractionDigits: 0,
+  });
+
+  return formatter.format(numberValue).replace("kr.", "kr");
+}
+
+export function getApexDomain(hostname: string) {
+  const domainParts = hostname.split(".");
+
+  if (domainParts.length < 2) {
+    return null;
+  }
+
+  return domainParts.slice(-2).join(".");
+}

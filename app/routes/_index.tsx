@@ -6,32 +6,13 @@ import type { Subscription } from "~/api";
 import { getApi } from "~/api";
 
 import { getUser } from "~/session.server";
-import { useOptionalUser } from "~/utils";
+import {
+  formatCurrencyIcelandic,
+  getApexDomain,
+  useOptionalUser,
+} from "~/utils";
 
 export const meta: V2_MetaFunction = () => [{ title: "Áskriftir - Samstöðin" }];
-
-function formatCurrencyIcelandic(input: string): string {
-  const numberValue = parseFloat(input);
-
-  const formatter = new Intl.NumberFormat("is-IS", {
-    style: "currency",
-    currency: "ISK",
-    currencyDisplay: "narrowSymbol",
-    maximumFractionDigits: 0,
-  });
-
-  return formatter.format(numberValue).replace("kr.", "kr");
-}
-
-function getApexDomain(hostname: string) {
-  const domainParts = hostname.split(".");
-
-  if (domainParts.length < 2) {
-    return null;
-  }
-
-  return domainParts.slice(-2).join(".");
-}
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
@@ -50,15 +31,14 @@ export async function action({ request }: ActionArgs) {
     }
     case "subscribe": {
       const externalDomain = process.env.EXTERNAL_HOST ?? "localhost";
+      const subscriptionId = formData.get("subscriptionId");
       const redirectUri = `https://${externalDomain}/`;
       return redirect(
         user
-          ? `https://askell.is/subscribe-button/${formData.get(
-              "subscriptionId"
-            )}/?reference=${user.kennitala}&redirect=${encodeURIComponent(
-              redirectUri
-            )}`
-          : `/join`
+          ? `https://askell.is/subscribe-button/${subscriptionId}/?reference=${
+              user.kennitala
+            }&redirect=${encodeURIComponent(redirectUri)}`
+          : `/askrift`
       );
     }
     default: {
@@ -86,6 +66,9 @@ function getAskriftCookieValue(domain: string, value: string) {
 
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request);
+  if (!user) {
+    return redirect("/askrift");
+  }
   const askell = getApi();
 
   const plans = await askell.get("/plans/");
@@ -163,18 +146,15 @@ export default function AskriftirPage() {
 
       <main className="bg-white p-4 h-full">
         <div className="space-y-4 mb-8">
-          <h1 className="text-3xl font-black">Skráning</h1>
+          <h1 className="text-3xl font-black">Áskrift</h1>
           <p>
-            Alþýðufélagið styrkir Samstöðina. Alþýðufélagið hefur það markmið að
-            auðga og bæta umræðu í samfélaginu. Allir geta gengið í
-            Alþýðufélagið og styrkt þar með efni og útbreiðslu Samstöðvarinnar.
+            Með áskrift að Samstöðinni styrkir fólk þætti og fréttaskrif og
+            tryggir einnig að hægt sé að hafa allt efni stöðvarinnar opið.
           </p>
           <p>
-            <strong>
-              Þú getur lagt þín lóð á vogarskálarnir í hverjum mánuði í þremur
-              þyngdarflokkum.
-            </strong>{" "}
-            Félagsgjöld eru innheimt með greiðsluseðli í heimabanka.
+            Með áskriftinni getur fólk líka orðið félagar í Alþýðufélaginu, sem
+            á og rekur Samstöðina. Samstöðin er eini fjölmiðillinn sem er í eigu
+            hlustenda, áhorfenda og lesenda.
           </p>
         </div>
         {data.subscription ? (
@@ -220,26 +200,40 @@ export default function AskriftirPage() {
             {data.plans.length === 0 ? (
               <p className="p-4">Engar áskriftir í boði</p>
             ) : (
-              <Form
-                method="POST"
-                action="/?index"
-                className="flex justify-center gap-2 sm:gap-4 md:gap-8"
-              >
+              <Form method="POST" action="/?index">
+                <label className="flex items-baseline gap-2 hover:cursor-pointer mb-4">
+                  <input
+                    className="w-4 h-4"
+                    type="checkbox"
+                    name="althydufelagid"
+                    defaultChecked
+                  />
+                  <span className="leading-relaxed">
+                    Ég vil vera félagi í Alþýðufélaginu
+                  </span>
+                </label>
+
+                <p>
+                  Þú getur lagt þín lóð á vogarskálarnar í hverjum mánuði í
+                  þremur þyngdarflokkum.
+                </p>
                 <input type="hidden" name="intent" value="subscribe" />
                 <input type="hidden" name="subscriptionId" ref={subRef} />
-                {data.plans.map(({ amount, id }) => (
-                  <button
-                    onClick={() => {
-                      if (subRef.current) {
-                        subRef.current.value = `${id}`;
-                      }
-                    }}
-                    key={id}
-                    className="rounded-md border-[1.5px] border-black font-black px-4 pt-2 pb-1.5 bg-white hover:-translate-y-1 hover:shadow-lg hover:scale-105 shadow-black/5 transition-transform"
-                  >
-                    {formatCurrencyIcelandic(amount!)}
-                  </button>
-                ))}
+                <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-4 md:gap-8">
+                  {data.plans.map(({ amount, id }) => (
+                    <button
+                      onClick={() => {
+                        if (subRef.current) {
+                          subRef.current.value = `${id}`;
+                        }
+                      }}
+                      key={id}
+                      className="rounded-md border-[1.5px] border-black font-black px-4 pt-2 pb-1.5 bg-white hover:-translate-y-1 hover:shadow-lg hover:scale-105 shadow-black/5 transition-transform"
+                    >
+                      {formatCurrencyIcelandic(amount!)}
+                    </button>
+                  ))}
+                </div>
               </Form>
             )}
           </div>

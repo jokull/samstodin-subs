@@ -16,17 +16,27 @@ export async function getUserByKennitala(kennitala: User["kennitala"]) {
   return prisma.user.findUnique({ where: { kennitala } });
 }
 
-export async function createUser(
-  email: User["email"],
-  password: string,
-  kennitala: string
-) {
+export async function createUser({
+  email,
+  name,
+  password,
+  kennitala,
+  althydufelagid,
+}: {
+  email: User["email"];
+  name: string;
+  password: string;
+  kennitala: string;
+  althydufelagid: boolean;
+}) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return prisma.user.create({
     data: {
+      name,
       email,
       kennitala,
+      althydufelagid,
       password: {
         create: {
           hash: hashedPassword,
