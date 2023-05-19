@@ -18,7 +18,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   const result = await getTokenDataFromRequest(request);
 
   if (!result.success) {
-    return new Response("Error", { status: 403 });
+    throw new Error("Invalid token");
   }
 
   return json(result.data);
