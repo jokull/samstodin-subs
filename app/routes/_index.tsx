@@ -74,13 +74,17 @@ export const loader = async ({ request }: LoaderArgs) => {
   const plans = await askell.get("/plans/");
   let subscription: Subscription | null = null;
   if (user) {
-    const subscriptions = await askell.get(
-      "/customers/:customerReference/subscriptions/",
-      {
-        params: { customerReference: user.kennitala },
-      }
-    );
-    subscription = subscriptions.find(({ active }) => active) ?? null;
+    try {
+      const subscriptions = await askell.get(
+        "/customers/:customerReference/subscriptions/",
+        {
+          params: { customerReference: user.kennitala },
+        }
+      );
+      subscription = subscriptions.find(({ active }) => active) ?? null;
+    } catch (error) {
+      subscription = null;
+    }
   }
 
   const cookieDomain = `.${getApexDomain(
