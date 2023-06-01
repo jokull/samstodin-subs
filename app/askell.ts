@@ -70,7 +70,7 @@ const Subscription = z
   .object({
     id: z.number().int(),
     trial_end: z.string().datetime().nullable(),
-    start_date: z.string().datetime(),
+    start_date: z.string().datetime().nullable(),
     ended_at: z.string().datetime().nullable(),
     active_until: z.string().datetime(),
     reference: z.string(),
@@ -79,7 +79,7 @@ const Subscription = z
     active: z.boolean(),
     meta: z.string(),
     token: z.string(),
-    customer: z.number(),
+    customer: Customer,
     billing_logs: z.array(BillingLog),
   })
   .partial();
@@ -153,10 +153,10 @@ const PaymentInitial = z
 const SubscriptionNoBillingLog = z
   .object({
     id: z.number().int(),
-    trial_end: z.string().datetime(),
-    start_date: z.string().datetime(),
-    ended_at: z.string().datetime(),
-    active_until: z.string().datetime(),
+    trial_end: z.string().datetime().nullable(),
+    start_date: z.string().datetime().nullable(),
+    ended_at: z.string().datetime().nullable(),
+    active_until: z.string().datetime().nullable(),
     reference: z.string(),
     description: z.string(),
     is_on_trial: z.boolean(),
@@ -546,7 +546,7 @@ To summarize, the four states are:
   {
     method: "post",
     path: "/temporarypaymentmethod/",
-    description: `The resulting &#x60;token&#x60; is a reference to a temporary payment method. You have to confirm this payment method by e.g. using it to activate a subscription, or adding a new payment method to a customer. Requires a public api key. 
+    description: `The resulting &#x60;token&#x60; is a reference to a temporary payment method. You have to confirm this payment method by e.g. using it to activate a subscription, or adding a new payment method to a customer. Requires a public api key.
 `,
     requestFormat: "json",
     parameters: [

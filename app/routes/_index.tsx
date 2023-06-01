@@ -1,9 +1,10 @@
 import type { ActionArgs, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { useRef } from "react";
 import type { Subscription } from "~/api";
 import { getApi } from "~/api";
+import { Header } from "~/components/Header";
 
 import { getUser } from "~/session.server";
 import {
@@ -116,37 +117,9 @@ export default function AskriftirPage() {
 
   return (
     <div className="flex h-full min-h-screen max-w-2xl mx-auto flex-col">
-      <header className="flex w-full items-center justify-between gap-4 p-4 text-black">
-        <div className="flex flex-col sm:flex-row sm:gap-4 sm:items-center">
-          <a
-            href="https://samstodin.is/"
-            className="flex gap-2 items-center font-black text-xl"
-          >
-            <img
-              src="/samstodin-logo-black.svg"
-              width={91 / 3}
-              height={72 / 3}
-              className="mb-0.5"
-              alt="Merki Samstöðvarinnar"
-            />
-            <h1>Samstöðin</h1>
-          </a>
-        </div>
-        <div className="flex flex-col sm:flex-row sm:gap-4 items-end sm:items-center">
-          {user ? (
-            <>
-              <p>{user.email}</p>
-              <Form action="/logout" method="post">
-                <button type="submit" className="underline">
-                  Útskrá
-                </button>
-              </Form>
-            </>
-          ) : (
-            <Link to="/login">Innskráning</Link>
-          )}
-        </div>
-      </header>
+      <div className="px-4">
+        <Header user={user} />
+      </div>
 
       <main className="bg-white p-4 h-full">
         <div className="space-y-4 mb-8">

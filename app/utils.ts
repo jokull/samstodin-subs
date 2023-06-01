@@ -111,4 +111,38 @@ export function getApexDomain(hostname: string) {
   return domainParts.slice(-2).join(".");
 }
 
-// Hello
+export function calculateAgeFromKennitala(kennitala: string) {
+  // Verify that the kennitala length is correct
+  if (kennitala.length !== 10) {
+    return null;
+  }
+
+  // Extract day, month, and year from the kennitala
+  let day = kennitala.slice(0, 2);
+  let month = kennitala.slice(2, 4);
+  let year = kennitala.slice(4, 6);
+
+  // Handle century: assume that '21' is prepended if birth year is less than current year, '20' otherwise
+  const currentYear = new Date().getFullYear() % 100;
+  let century = parseInt(year) <= currentYear ? "20" : "19";
+  year = century + year;
+
+  // Construct a Date object from the extracted values
+  let birthDate = new Date(`${year}-${month}-${day}`);
+
+  // Verify that the birth date is a valid date
+  if (isNaN(birthDate.getTime())) {
+    return null;
+  }
+
+  // Calculate the age based on the current date
+  let today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}

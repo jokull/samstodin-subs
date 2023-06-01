@@ -18,6 +18,7 @@ model User {
   password       Password?
   kennitala      String    @unique @default("")
   althydufelagid Boolean   @default(true)
+  isAdmin        Boolean   @default(false)
 }
 
 model Password {
