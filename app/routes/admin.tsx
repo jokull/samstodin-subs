@@ -110,7 +110,14 @@ export default function AskriftirPage() {
                         {calculateAgeFromKennitala(user.kennitala)}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {subscription?.active ? "✓" : null}
+                        {subscription?.active
+                          ? subscription.billing_logs
+                              .find(
+                                ({ transaction }) =>
+                                  transaction?.state === "settled"
+                              )
+                              ?.total.split(".")[0] + " kr."
+                          : null}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {user.althydufelagid ? "✓" : null}
