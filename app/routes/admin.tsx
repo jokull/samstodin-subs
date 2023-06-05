@@ -88,7 +88,13 @@ export default function AskriftirPage() {
                     </th>
                     <th
                       scope="col"
-                      className="relative py-3.5 pl-3 pr-4 sm:pr-0"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Byrjaði
+                    </th>
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 sm:pr-0 text-left text-sm font-semibold text-gray-900"
                     >
                       Alþýðufélag
                     </th>
@@ -121,7 +127,10 @@ export default function AskriftirPage() {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {settledTransaction
                             ? settledTransaction.total?.split(".")[0] + " kr."
-                            : null}
+                            : null}{" "}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {subscription?.start_date?.slice(0, 10)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {user.althydufelagid ? "✓" : null}
