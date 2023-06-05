@@ -95,35 +95,40 @@ export default function AskriftirPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {data.subscriptionUsers?.map(({ user, subscription }) => (
-                    <tr key={user.email}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                        {user.name}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {user.kennitala}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {user.email}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {calculateAgeFromKennitala(user.kennitala)}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {subscription?.active
-                          ? subscription.billing_logs
-                              .find(
-                                ({ transaction }) =>
-                                  transaction?.state === "settled"
-                              )
-                              ?.total.split(".")[0] + " kr."
-                          : null}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {user.althydufelagid ? "✓" : null}
-                      </td>
-                    </tr>
-                  ))}
+                  {data.subscriptionUsers?.map(({ user, subscription }) => {
+                    const billingLogs = subscription?.active
+                      ? subscription?.billing_logs ?? null
+                      : null;
+                    const settledTransaction =
+                      billingLogs?.find(
+                        ({ transaction }) => transaction?.state === "settled"
+                      ) ?? null;
+
+                    return (
+                      <tr key={user.email}>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                          {user.name}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.kennitala}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.email}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {calculateAgeFromKennitala(user.kennitala)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {settledTransaction
+                            ? settledTransaction.total?.split(".")[0] + " kr."
+                            : null}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.althydufelagid ? "✓" : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
