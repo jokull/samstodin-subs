@@ -27,7 +27,11 @@ export const loader = async ({ request }: LoaderArgs) => {
       user,
       subscription:
         subscriptions.find((subscription) => {
-          const email = subscription.customer?.email;
+          const customer = subscription.customer;
+          if (typeof customer === "number") {
+            return undefined;
+          }
+          const email = customer?.email;
           if (
             email &&
             normalizeEmail(email) === user.email &&

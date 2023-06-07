@@ -79,7 +79,7 @@ const Subscription = z
     active: z.boolean(),
     meta: z.string(),
     token: z.string(),
-    customer: Customer,
+    customer: z.union([Customer, z.number()]),
     billing_logs: z.array(BillingLog),
   })
   .partial();

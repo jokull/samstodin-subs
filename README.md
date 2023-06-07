@@ -2,6 +2,13 @@
 
 Áskriftarkerfi smíðað ofan á Áskel frá Overcast.
 
+Development
+
+```bash
+pnpm tunnel
+pnpm dev
+```
+
 SQLite console:
 
 ```bash
