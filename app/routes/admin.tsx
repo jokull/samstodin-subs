@@ -6,7 +6,7 @@ import { Header } from "~/components/Header";
 import { prisma } from "~/db.server";
 
 import { getUser } from "~/session.server";
-import { calculateAgeFromKennitala, normalizeEmail, useUser } from "~/utils";
+import { calculateAgeFromKennitala, useUser } from "~/utils";
 
 export const meta: V2_MetaFunction = () => [{ title: "Áskriftir - Samstöðin" }];
 
@@ -31,10 +31,10 @@ export const loader = async ({ request }: LoaderArgs) => {
           if (typeof customer === "number") {
             return undefined;
           }
-          const email = customer?.email;
+          const kennitala = customer?.customer_reference;
           if (
-            email &&
-            normalizeEmail(email) === user.email &&
+            kennitala &&
+            kennitala === user.kennitala &&
             subscription.active
           ) {
             return subscription;
