@@ -32,7 +32,10 @@ export const loader = async ({ request }: LoaderArgs) => {
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
   const email = formData.get("email");
-  const kennitala = formData.get("kennitala");
+  const kennitala = (formData.get("kennitala")?.toString() ?? "").replace(
+    /-/g,
+    ""
+  );
   const althydufelagid = formData.get("althydufelagid") === "on";
   const name = formData.get("name");
   const subscriptionId = formData.get("subscriptionId");

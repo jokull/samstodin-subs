@@ -10,9 +10,18 @@ import type { EntryContext } from "@remix-run/node";
 import { Response } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
+
+import * as Sentry from "@sentry/remix";
 import { renderToPipeableStream } from "react-dom/server";
 
 const ABORT_DELAY = 5_000;
+
+Sentry.init({
+  dsn: "https://ef19d773f9f24170aede6d7e72fa76d3@o4505495979229184.ingest.sentry.io/4505495980277760",
+  // integrations: [new Sentry.Integrations.Prisma({ client: prisma })],
+  // Performance Monitoring
+  tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+});
 
 export default function handleRequest(
   request: Request,

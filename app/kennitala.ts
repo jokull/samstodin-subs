@@ -1,5 +1,5 @@
 export function isValidKennitala(kennitala: string): boolean {
-  const kt = kennitala.replace(/-/g, "");
+  const kt = kennitala;
   if (kt.length !== 10) return false;
 
   const list = kt.split("").map(Number);
