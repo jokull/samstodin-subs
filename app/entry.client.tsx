@@ -4,13 +4,10 @@
  * For more information, see https://remix.run/docs/en/main/file-conventions/entry.client
  */
 
-import { RemixBrowser } from "@remix-run/react";
-import { startTransition, StrictMode } from "react";
-import { hydrateRoot } from "react-dom/client";
-
-import { useLocation, useMatches } from "@remix-run/react";
+import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
 import * as Sentry from "@sentry/remix";
-import { useEffect } from "react";
+import { StrictMode, startTransition, useEffect } from "react";
+import { hydrateRoot } from "react-dom/client";
 
 Sentry.init({
   dsn: "https://ef19d773f9f24170aede6d7e72fa76d3@o4505495979229184.ingest.sentry.io/4505495980277760",
