@@ -121,7 +121,9 @@ export const action = async ({ request }: ActionArgs) => {
   const tokenUrl = `https://${process.env.EXTERNAL_HOST}/stadfesta?token=${token}`;
 
   if (process.env.EXTERNAL_HOST !== "samstodin-subs.solberg.is") {
-    await sendEmail(email, "Staðfestu skráningu", tokenUrl);
+    const emailText = "Staðfestu skráningu";
+    const emailHtml = `<a href="${tokenUrl}">Staðfestu skráningu</a>`;
+    await sendEmail(email, emailText, tokenUrl, emailHtml);
   } else {
     console.debug({ tokenUrl });
   }
