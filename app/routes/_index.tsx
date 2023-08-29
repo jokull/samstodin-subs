@@ -136,7 +136,7 @@ export default function AskriftirPage() {
         </div>
         {data.subscription ? (
           <div className="space-y-4 mb-8">
-            <p>Þú ert með áskrift að Samstöðinni.</p>
+            <p className="font-bold">Þú ert með áskrift að Samstöðinni.</p>
             {data.subscription.active_until ? (
               <p>
                 {data.subscription.ended_at
@@ -149,28 +149,34 @@ export default function AskriftirPage() {
                 })}
               </p>
             ) : null}
-            <>
-              <a
-                className="underline"
-                target="_blank"
-                href={`https://askell.is/change_subscription/${
-                  data.subscription.token ?? ""
-                }`}
-                rel="noreferrer"
-              >
-                Breyta greiðslu
-              </a>{" "}
-              eða{" "}
-              <Form action="/?index" method="POST" className="inline">
-                <input type="hidden" name="intent" value="unsubscribe" />
-                <input
-                  type="hidden"
-                  name="subscriptionId"
-                  value={data.subscription.id ?? ""}
-                />
-                <button className="underline">segja upp áskrift</button>
-              </Form>
-            </>
+            <p className="mb-8">
+              Til að breyta um upphæð þarf að segja upp áskrift fyrst og skrá
+              þig svo aftur.
+            </p>
+            <div>
+              <>
+                <a
+                  className="underline"
+                  target="_blank"
+                  href={`https://askell.is/change_subscription/${
+                    data.subscription.token ?? ""
+                  }`}
+                  rel="noreferrer"
+                >
+                  Uppfæra greiðslumáta
+                </a>{" "}
+                eða{" "}
+                <Form action="/?index" method="POST" className="inline">
+                  <input type="hidden" name="intent" value="unsubscribe" />
+                  <input
+                    type="hidden"
+                    name="subscriptionId"
+                    value={data.subscription.id ?? ""}
+                  />
+                  <button className="underline">segja upp áskrift</button>
+                </Form>
+              </>
+            </div>
           </div>
         ) : (
           <div>

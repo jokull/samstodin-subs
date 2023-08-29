@@ -129,8 +129,10 @@ export default function AskriftirPage() {
                           {calculateAgeFromKennitala(user.kennitala)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {settledTransaction
-                            ? settledTransaction.total?.split(".")[0] + " kr."
+                          {settledTransaction?.transaction?.amount
+                            ? settledTransaction.transaction.amount.split(
+                                "."
+                              )[0] + " kr."
                             : null}{" "}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
