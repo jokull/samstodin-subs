@@ -46,6 +46,14 @@ export async function createUser({
   });
 }
 
+export async function updateUserPassword(user: User, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await prisma.password.update({
+    data: { hash: hashedPassword },
+    where: { userId: user.id },
+  });
+}
+
 export async function deleteUserByEmail(email: User["email"]) {
   return prisma.user.delete({ where: { email } });
 }

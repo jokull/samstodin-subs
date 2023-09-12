@@ -110,6 +110,16 @@ export default function LoginPage() {
                 </div>
               ) : null}
             </div>
+            <div className="text-right text-sm text-gray-500 mt-1">
+              <Link
+                className="text-blue-500 underline"
+                to={{
+                  pathname: "/lykilord",
+                }}
+              >
+                Gleymt lykilorð?
+              </Link>
+            </div>
           </div>
 
           <div>
