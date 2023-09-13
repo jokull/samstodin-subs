@@ -7,7 +7,8 @@ export default function Stadfesting() {
         <Logo />
         <div className="mt-4">
           Þú færð núna tölvupóst frá okkur með hlekk. Smelltu á hann til að
-          staðfesta skráninguna.
+          staðfesta skráninguna. Athugið að þar með ert þú ekki orðinn
+          áskrifandi. Það færð sér staðfestingu þess efnis.
         </div>
       </div>
     </div>
