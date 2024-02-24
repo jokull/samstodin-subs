@@ -36,7 +36,7 @@ function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta property="og:image" content="/opengraph-7.jpg"></meta>
+        <meta property="og:image" content="/opengraph-12.jpg"></meta>
         <Meta />
         <Links />
       </head>
@@ -50,6 +50,11 @@ function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <footer className="py-8 px-6 text-center text-xs text-neutral-500">
+          <a href="http://samstodin.is/skilmalar" className="underline">
+            Skilmálar & persónuverndarstefna
+          </a>
+        </footer>
       </body>
     </html>
   );
