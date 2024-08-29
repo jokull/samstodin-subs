@@ -469,6 +469,9 @@ To summarize, the four states are:
     path: "/subscriptions/",
     requestFormat: "json",
     response: z.array(Subscription),
+    parameters: [
+      { name: "type", type: "Query", schema: z.enum(["light", "full"]) },
+    ],
   },
   {
     method: "get",

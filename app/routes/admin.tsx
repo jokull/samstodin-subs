@@ -17,7 +17,9 @@ export const loader = async ({ request }: LoaderArgs) => {
   }
   const askell = getApi();
 
-  const subscriptions = await askell.get("/subscriptions/");
+  const subscriptions = await askell.get("/subscriptions/", {
+    queries: { type: "light" },
+  });
   const users = await prisma.user.findMany({
     orderBy: [{ createdAt: "desc" }],
   });
