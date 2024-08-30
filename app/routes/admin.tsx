@@ -3,6 +3,7 @@ import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getApi } from "~/api";
 import { Header } from "~/components/Header";
+import Pagination from "~/components/Pagination";
 import { prisma } from "~/db.server";
 
 import { getUser } from "~/session.server";
@@ -15,20 +16,27 @@ export const loader = async ({ request }: LoaderArgs) => {
   if (!user || !user.isAdmin) {
     return redirect("/askrift");
   }
+
+  const url = new URL(request.url);
+  const page = url.searchParams.get("page") || "1";
+  const pageSize = 50;
+
   const askell = getApi();
 
-  const subscriptions = await askell.get("/subscriptions/", {
-    queries: { type: "light" },
+  const { count, results } = await askell.get("/subscriptions/", {
+    queries: { type: "full", page, page_size: pageSize.toString() },
   });
   const users = await prisma.user.findMany({
     orderBy: [{ createdAt: "desc" }],
   });
 
   return json({
+    page: parseInt(page, 10),
+    totalPages: Math.ceil(count / pageSize),
     subscriptionUsers: users.map((user) => ({
       user,
       subscription:
-        subscriptions.find((subscription) => {
+        results.find((subscription) => {
           const customer = subscription.customer;
           if (typeof customer === "number") {
             return undefined;
@@ -148,6 +156,7 @@ export default function AskriftirPage() {
                   })}
                 </tbody>
               </table>
+              <Pagination page={data.page} totalPages={data.totalPages} />
             </div>
           </div>
         </div>
