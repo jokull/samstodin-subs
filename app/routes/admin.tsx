@@ -24,7 +24,12 @@ export const loader = async ({ request }: LoaderArgs) => {
   const askell = getApi();
 
   const { count, results } = await askell.get("/subscriptions/", {
-    queries: { type: "full", page, page_size: pageSize.toString() },
+    queries: {
+      type: "full",
+      page,
+      page_size: pageSize.toString(),
+      ordering: "-start_date",
+    },
   });
   const users = await prisma.user.findMany({
     orderBy: [{ createdAt: "desc" }],
@@ -42,11 +47,8 @@ export const loader = async ({ request }: LoaderArgs) => {
         user:
           users.find((user) => {
             const customer = subscription.customer;
-            if (typeof customer === "number") {
-              return undefined;
-            }
-            const kennitala = customer?.customer_reference;
-            if (kennitala && kennitala === user.kennitala) {
+            const kennitala = customer.customer_reference;
+            if (kennitala === user.kennitala) {
               return user;
             }
             return undefined;

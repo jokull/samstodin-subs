@@ -473,6 +473,16 @@ To summarize, the four states are:
       { name: "type", type: "Query", schema: z.enum(["light", "full"]) },
       { name: "page_size", type: "Query", schema: z.string() },
       { name: "page", type: "Query", schema: z.string() },
+      {
+        name: "ordering",
+        type: "Query",
+        schema: z.enum([
+          "-start_date",
+          "start_date",
+          "-active_until",
+          "active_until",
+        ]),
+      },
     ],
   },
   {
