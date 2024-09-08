@@ -31,29 +31,57 @@ export const loader = async ({ request }: LoaderArgs) => {
       ordering: "-start_date",
     },
   });
+
+  const subscriptions = results.flatMap(({ customer, ...sub }) =>
+    customer && typeof customer === "object" ? [{ customer, ...sub }] : []
+  );
+
+  // Use reduce to find the min and max dates
+  const { minDate, maxDate } = subscriptions.reduce(
+    (acc: { minDate: Date | null; maxDate: Date | null }, subscription) => {
+      const { start_date } = subscription;
+
+      if (start_date) {
+        const startDate = new Date(start_date);
+
+        if (!acc.minDate || startDate < acc.minDate) {
+          acc.minDate = startDate;
+        }
+        if (!acc.maxDate || startDate > acc.maxDate) {
+          acc.maxDate = startDate;
+        }
+      }
+      return acc;
+    },
+    { minDate: null, maxDate: null }
+  );
+
+  console.log(minDate, maxDate);
+
   const users = await prisma.user.findMany({
     orderBy: [{ createdAt: "desc" }],
+    where: {
+      createdAt:
+        minDate && maxDate
+          ? {
+              gte: minDate,
+              lte: maxDate,
+            }
+          : undefined,
+    },
+  });
+
+  const subscriptionUsers = users.map((user) => {
+    const subscription = subscriptions.find(
+      ({ customer }) => customer.customer_reference === user.kennitala
+    );
+    return { subscription, user };
   });
 
   return json({
     page: parseInt(page, 10),
     totalPages: Math.ceil(count / pageSize),
-    subscriptionUsers: results
-      .flatMap(({ customer, ...sub }) =>
-        customer && typeof customer === "object" ? [{ customer, ...sub }] : []
-      )
-      .map((subscription) => ({
-        subscription,
-        user:
-          users.find((user) => {
-            const customer = subscription.customer;
-            const kennitala = customer.customer_reference;
-            if (kennitala === user.kennitala) {
-              return user;
-            }
-            return undefined;
-          }) ?? null,
-      })),
+    subscriptionUsers,
   });
 };
 
@@ -130,21 +158,18 @@ export default function AskriftirPage() {
                     );
 
                     return (
-                      <tr key={subscription.customer.id}>
+                      <tr key={user.id}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                          {subscription.customer.first_name}{" "}
-                          {subscription.customer.last_name}
+                          {user.name}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {subscription.customer.customer_reference}
+                          {user.kennitala}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {subscription.customer.email}
+                          {user.email}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {calculateAgeFromKennitala(
-                            subscription.customer.customer_reference
-                          )}
+                          {calculateAgeFromKennitala(user.kennitala)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {settledTransactions[0]?.transaction?.amount
@@ -158,15 +183,19 @@ export default function AskriftirPage() {
                         </td>
                         <td
                           className={`whitespace-nowrap px-3 py-4 text-sm underline text-gray-500 ${
-                            subscription.active ? "" : "text-red-600"
+                            subscription?.active ? "" : "text-red-600"
                           }`}
                         >
-                          <Link
-                            target="_blank"
-                            to={`https://askell.is/dashboard/customers/${subscription.customer.id}/`}
-                          >
-                            {subscription.active ? "Virk" : "Óvirk"}
-                          </Link>
+                          {subscription ? (
+                            <Link
+                              target="_blank"
+                              to={`https://askell.is/dashboard/customers/${subscription.customer.id}/`}
+                            >
+                              {subscription.active ? "Virk" : "Óvirk"}
+                            </Link>
+                          ) : (
+                            <span>Óskráður</span>
+                          )}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {user?.althydufelagid ? "✓" : null}
