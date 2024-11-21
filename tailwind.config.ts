@@ -1,9 +1,15 @@
 import type { Config } from "tailwindcss";
 
-export default {
-  content: ["./app/**/*.{js,jsx,ts,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-} satisfies Config;
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require("tailwindcss-react-aria-components"),
+  ],
+};
+
+export default config;
