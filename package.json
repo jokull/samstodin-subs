@@ -1,5 +1,5 @@
 {
-  "name": "gymrat-drizzle",
+  "name": "samstodin-subs",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -61,8 +61,6 @@
       "<BUILT_IN_MODULES>",
       "",
       "<THIRD_PARTY_MODULES>",
-      "",
-      "@trip/(.*)$",
       "",
       "^~/(.*)$",
       "",

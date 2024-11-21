@@ -9,9 +9,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Gymrat",
-  description: "The simple workout tracker",
-  metadataBase: new URL(`https://${process.env.HOST}/`),
+  title: "Samstöðin Áskriftir",
+  metadataBase: new URL(`https://${process.env.EXTERNAL_HOST}/`),
 };
 
 export default function RootLayout({
