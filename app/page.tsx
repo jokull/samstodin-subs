@@ -95,7 +95,8 @@ export default async function Page() {
     ) {
       return undefined;
     }
-    throw error;
+    console.log(error);
+    return undefined;
   });
 
   return (
