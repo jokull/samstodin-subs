@@ -51,7 +51,7 @@ const PaymentMethod = z
 const Customer = CustomerCreate.and(
   z
     .object({ id: z.number().int(), payment_method: z.array(PaymentMethod) })
-    .partial()
+    .partial(),
 );
 const inline_response_400 = z
   .object({ status: z.string(), error: z.string() })
@@ -667,8 +667,6 @@ def handle_webhook(request):
     response: z.void(),
   },
 ]);
-
-export const api = new Zodios(endpoints);
 
 export function createApiClient(baseUrl: string, options?: ZodiosOptions) {
   return new Zodios(baseUrl, endpoints, options);

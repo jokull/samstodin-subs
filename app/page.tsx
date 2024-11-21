@@ -1,7 +1,9 @@
+import { isErrorFromPath } from "@zodios/core";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { Header } from "~/components/Header";
+import { askell } from "~/lib/api";
 import { getSession } from "~/lib/session";
 
 import { Subscribe } from "./_components/subscribe";
@@ -82,7 +84,19 @@ export default async function Page() {
     redirect("/askrift");
   }
 
-  const subscription = await getSubscription(user);
+  const subscription = await getSubscription(user).catch((error) => {
+    if (
+      isErrorFromPath(
+        askell.api,
+        "get",
+        "/customers/:customerReference/subscriptions/",
+        error,
+      )
+    ) {
+      return undefined;
+    }
+    throw error;
+  });
 
   return (
     <div className="mx-auto flex h-full min-h-screen max-w-2xl flex-col">
