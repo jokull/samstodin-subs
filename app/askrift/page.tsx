@@ -8,7 +8,7 @@ import { Form } from "./_components/form";
 
 export default async function Askrift() {
   const plans = await getPlans();
-  const user = await getSession(cookies());
+  const user = await getSession(cookies().get("__session")?.value ?? "");
   if (user) {
     redirect("/");
   }

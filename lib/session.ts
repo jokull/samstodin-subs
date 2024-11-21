@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { sealData, unsealData } from "iron-session";
-import { type cookies as _cookies } from "next/headers";
 import { z } from "zod";
 
 import { Password, User } from "../schema";
@@ -23,9 +22,8 @@ export async function unsealVerificationToken(token: string) {
   return sessionSchema.parse({ email: unsealed }).email;
 }
 
-export async function getSession(cookies: ReturnType<typeof _cookies>) {
-  const cookie = cookies.get("__session")?.value ?? "";
-  const data = await unsealData(cookie, {
+export async function getSession(token: string) {
+  const data = await unsealData(token, {
     password: process.env.SESSION_SECRET ?? "",
   });
   const result = sessionSchema.safeParse(data);
@@ -35,7 +33,6 @@ export async function getSession(cookies: ReturnType<typeof _cookies>) {
   const user = await db.query.User.findFirst({
     where: eq(User.email, result.data.email),
   });
-
   return user;
 }
 

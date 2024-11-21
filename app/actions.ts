@@ -8,7 +8,7 @@ import { askell } from "~/lib/api";
 import { getSession } from "~/lib/session";
 
 export async function subscribe(planId: string) {
-  const user = await getSession(cookies());
+  const user = await getSession(cookies().get("__session")?.value ?? "");
   const externalDomain = process.env.EXTERNAL_HOST ?? "localhost";
   const redirectUri = `https://${externalDomain}/`;
   if (user) {
@@ -22,7 +22,7 @@ export async function subscribe(planId: string) {
 }
 
 export async function unsubscribe(subscriptionId: string) {
-  const user = await getSession(cookies());
+  const user = await getSession(cookies().get("__session")?.value ?? "");
   if (!user) {
     return;
   }

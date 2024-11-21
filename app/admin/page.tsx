@@ -16,7 +16,7 @@ export default async function Page({
 }: {
   searchParams: Record<string, string>;
 }) {
-  const user = await getSession(cookies());
+  const user = await getSession(cookies().get("__session")?.value ?? "");
   if (!user || !user.isAdmin) {
     redirect("/askrift");
   }
@@ -152,12 +152,12 @@ export default async function Page({
                           {user.name}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {user.kennitala}
+                          {kennitala?.formatted ?? user.kennitala}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {user.email}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td className="whitespace-nowrap px-3 py-4 text-sm tabular-nums text-gray-500">
                           {kennitala
                             ? getKennitalaBirthDate(
                                 kennitala.value,

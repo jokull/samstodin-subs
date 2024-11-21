@@ -76,7 +76,7 @@ function Subscription({ subscription }: { subscription: SubscriptionType }) {
 }
 
 export default async function Page() {
-  const user = await getSession(cookies());
+  const user = await getSession(cookies().get("__session")?.value ?? "");
 
   if (!user) {
     redirect("/askrift");
