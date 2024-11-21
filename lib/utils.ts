@@ -31,11 +31,15 @@ export function normalizeEmail(value: string) {
   const emailParts = email.split(/@/);
 
   if (emailParts.length !== 2) {
-    throw new Error("Email is not formatted correctly");
+    throw new Error("Error not formatted");
   }
 
   let username = emailParts[0]!;
   const domain = emailParts[1]!;
+
+  if (["gmail.com", "fastmail.com", "googlemail.com"].includes(domain)) {
+    username = username.replace(".", "");
+  }
 
   return username + "@" + domain;
 }
