@@ -34,7 +34,10 @@ export function Form({ plans, user }: { plans: Plan[]; user?: User }) {
       kennitala: useField({
         value: user?.kennitala ?? "",
         validates: (value) => {
-          const kennitala = parseKennitala(value, { strictDate: true });
+          const kennitala = parseKennitala(value, {
+            strictDate: true,
+            robot: false,
+          });
           if (!kennitala) {
             return "Þetta er ekki gild kennitala";
           }
@@ -44,10 +47,11 @@ export function Form({ plans, user }: { plans: Plan[]; user?: User }) {
       name: useField({ value: "", validates: notEmptyString("Nafn vantar") }),
     },
     onSubmit: async ({ althydufelagid, email, kennitala, name }) => {
+      const kennitalaData = parseKennitala(kennitala, { robot: false });
       const response = await action({
         althydufelagid,
         email,
-        kennitala,
+        kennitala: kennitalaData!.value,
         name,
         planId: plan.id!.toString(),
         redirectTo,

@@ -1,5 +1,6 @@
 "use server";
 
+import { KennitalaData } from "is-kennitala";
 import { redirect } from "next/navigation";
 
 import { getUserByEmail, getUserByKennitala } from "~/lib/queries/users";
@@ -13,7 +14,7 @@ export async function action({
   name,
   planId,
 }: {
-  kennitala: string;
+  kennitala: KennitalaData["value"];
   email: string;
   althydufelagid: boolean;
   name: string;
@@ -24,6 +25,7 @@ export async function action({
   if (existingUser) {
     return { error: "Notandi með þetta netfang er nú þegar með aðgang" };
   }
+
   existingUser = await getUserByKennitala(kennitala);
   if (existingUser) {
     return { error: "Notandi með þessa kennitölu er nú þegar með aðgang" };
@@ -31,7 +33,7 @@ export async function action({
 
   const token = await getToken({
     email,
-    kennitala,
+    kennitala: kennitala,
     althydufelagid,
     name,
     planId,
