@@ -7,7 +7,9 @@ export const sendEmail = async (
   html?: string
 ) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.fastmail.com",
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.SAMSTODIN_EMAIL_ADDRESS,
       pass: process.env.SAMSTODIN_EMAIL_PASSWORD,
@@ -15,7 +17,7 @@ export const sendEmail = async (
   });
 
   return await transporter.sendMail({
-    from: "yourname@gmail.com",
+    from: `Samstöðin <${process.env.SAMSTODIN_EMAIL_ADDRESS}>`,
     to: recipient,
     subject: subject,
     text: text,
