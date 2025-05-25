@@ -1,4 +1,4 @@
-import { and, countDistinct, desc, gte, lte } from "drizzle-orm";
+import { and, desc, gte, lte } from "drizzle-orm";
 import { getKennitalaBirthDate, parseKennitala } from "is-kennitala";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -22,9 +22,8 @@ export default async function Page({
   }
 
   const page = searchParams.page ?? "1";
-  const pageSize = 10;
+  const pageSize = 50;
 
-  console.log("👍🏻")
   const { count, results } = await askell.get("/subscriptions/", {
     queries: {
       type: "full",
@@ -33,14 +32,13 @@ export default async function Page({
       ordering: "-start_date",
     },
   });
-  console.log("🍏")
 
   const subscriptions = results.flatMap(({ customer, ...sub }) =>
     customer && typeof customer === "object" ? [{ customer, ...sub }] : [],
   );
 
   // Use reduce to find the min and max dates
-  const { minDate, maxDate } = subscriptions.reduce(
+  let { minDate, maxDate } = subscriptions.reduce(
     (acc: { minDate: Date | null; maxDate: Date | null }, subscription) => {
       const { start_date } = subscription;
 
@@ -59,16 +57,18 @@ export default async function Page({
     { minDate: null, maxDate: null },
   );
 
-  console.log("🥕")
-  console.log(await db.select({ count: countDistinct(User.id) }).from(User));
+  // If page = 1 then set minDate to today
+  if (page === "1") {
+    maxDate = new Date();
+  }
+
   const users = await db.query.User.findMany({
     where:
-      page !== "1" && minDate && maxDate
+      minDate && maxDate
         ? and(gte(User.createdAt, minDate), lte(User.createdAt, maxDate))
         : undefined,
     orderBy: desc(User.createdAt),
   });
-  console.log("🥦")
 
   const subscriptionUsers = users.map((user) => {
     const subscription = subscriptions.find(
