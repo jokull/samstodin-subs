@@ -27,7 +27,7 @@ const googleIdTokenPayloadSchema = z.object({
   picture: z.string().url().optional(),
 });
 
-const REDIRECT_URI = `https://${process.env.NEXT_PUBLIC_VERCEL_URL!}/callback`;
+const REDIRECT_URI = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}/callback`;
 
 const oauth_google = {
   endpoint: "https://accounts.google.com/o/oauth2/v2/auth",

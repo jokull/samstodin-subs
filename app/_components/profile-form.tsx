@@ -8,23 +8,29 @@ import { Logo } from "~/components/Logo";
 
 import { createProfile } from "./profile-actions";
 
+export function useProfileFields() {
+  return {
+    kennitala: useField({
+      value: "",
+      validates: (value) => {
+        const kennitala = parseKennitala(value, {
+          strictDate: true,
+          robot: false,
+        });
+        if (!kennitala) {
+          return "Þetta er ekki gild kennitala";
+        }
+      },
+    }),
+    althydufelagid: useField(true),
+    name: useField({ value: "", validates: notEmptyString("Nafn vantar") }),
+  } as const;
+}
+
 export function ProfileForm() {
   const { fields, submit, submitErrors, submitting } = useForm({
     fields: {
-      kennitala: useField({
-        value: "",
-        validates: (value) => {
-          const kennitala = parseKennitala(value, {
-            strictDate: true,
-            robot: false,
-          });
-          if (!kennitala) {
-            return "Þetta er ekki gild kennitala";
-          }
-        },
-      }),
-      althydufelagid: useField(true),
-      name: useField({ value: "", validates: notEmptyString("Nafn vantar") }),
+      ...useProfileFields(),
     },
     onSubmit: async ({ althydufelagid, kennitala, name }) => {
       const kennitalaData = parseKennitala(kennitala, { robot: false });

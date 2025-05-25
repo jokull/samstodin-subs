@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     if (result.error.type === "auth") {
       const errorUrl = new URL(
         "/auth/error",
-        `https://${process.env.NEXT_PUBLIC_VERCEL_URL!}`,
+        `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}`,
       );
       errorUrl.searchParams.set("error", result.error.message);
       return NextResponse.redirect(errorUrl);
@@ -68,6 +68,6 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.redirect(
-    `https://${process.env.NEXT_PUBLIC_VERCEL_URL!}${redirectUrl ?? "/"}`,
+    `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}${redirectUrl ?? "/"}`,
   );
 }

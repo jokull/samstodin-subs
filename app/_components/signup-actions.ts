@@ -8,7 +8,7 @@ import { getGoogleAuthUrl } from "../google-auth";
 export async function startGoogleAuthFlow(redirectTo?: string) {
   redirect(
     getGoogleAuthUrl({
-      redirect: `https://${process.env.NEXT_PUBLIC_VERCEL_URL!}${redirectTo ?? ""}`,
+      redirect: `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}${redirectTo ?? ""}`,
     }),
   );
 }
