@@ -59,6 +59,7 @@ export default async function Page({
     { minDate: null, maxDate: null },
   );
 
+  console.log("🥕")
   const users = await db.query.User.findMany({
     where:
       page !== "1" && minDate && maxDate
