@@ -15,6 +15,7 @@
 
 # production
 /build
+<<<<<<< Updated upstream
 
 # misc
 .DS_Store
@@ -39,3 +40,18 @@ next-env.d.ts
 data.sqld
 
 ./.env
+=======
+/public/build
+.env
+.env.*
+
+/cypress/screenshots
+/cypress/videos
+/prisma/data.db
+/prisma/data.db-journal
+
+tsconfig.tsbuildinfo
+.next
+.vercel
+*.sql
+>>>>>>> Stashed changes
