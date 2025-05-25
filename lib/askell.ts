@@ -63,7 +63,7 @@ const BillingLog = z
     billing_date: z.string().datetime(),
     plan_billed_up_to: z.string().datetime(),
     total: z.string().nullable(),
-    transaction: Transaction,
+    transaction: Transaction.nullable(),
   })
   .partial();
 const Subscription = z
