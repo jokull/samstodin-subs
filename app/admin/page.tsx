@@ -24,6 +24,7 @@ export default async function Page({
   const page = searchParams.page ?? "1";
   const pageSize = 10;
 
+  console.log("👍🏻")
   const { count, results } = await askell.get("/subscriptions/", {
     queries: {
       type: "full",
@@ -32,6 +33,7 @@ export default async function Page({
       ordering: "-start_date",
     },
   });
+  console.log("🍏")
 
   const subscriptions = results.flatMap(({ customer, ...sub }) =>
     customer && typeof customer === "object" ? [{ customer, ...sub }] : [],
