@@ -59,7 +59,7 @@ export default async function Page({
 
   const users = await db.query.User.findMany({
     where:
-      minDate && maxDate
+      page !== "1" && minDate && maxDate
         ? and(gte(User.createdAt, minDate), lte(User.createdAt, maxDate))
         : undefined,
     orderBy: desc(User.createdAt),

@@ -87,6 +87,32 @@ export function Form({ plans, user }: { plans: Plan[]; user?: User }) {
           </div>
           <div>
             <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Fullt nafn
+            </label>
+            <div className="mt-1">
+              <input
+                value={fields.name.value}
+                onChange={fields.name.onChange}
+                required
+                autoFocus={true}
+                name="name"
+                autoComplete="name"
+                aria-invalid={fields.name.error ? true : undefined}
+                aria-describedby="name-error"
+                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              />
+              {fields.name.error ? (
+                <div className="pt-1 text-red-700" id="name-error">
+                  {fields.name.error}
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div>
+            <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
@@ -112,32 +138,6 @@ export function Form({ plans, user }: { plans: Plan[]; user?: User }) {
             </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Fullt nafn
-            </label>
-            <div className="mt-1">
-              <input
-                value={fields.name.value}
-                onChange={fields.name.onChange}
-                required
-                autoFocus={true}
-                name="name"
-                autoComplete="name"
-                aria-invalid={fields.name.error ? true : undefined}
-                aria-describedby="name-error"
-                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
-              />
-              {fields.name.error ? (
-                <div className="pt-1 text-red-700" id="name-error">
-                  {fields.name.error}
-                </div>
-              ) : null}
-            </div>
-          </div>
 
           <div>
             <label
