@@ -22,7 +22,7 @@ export default async function Page({
   }
 
   const page = searchParams.page ?? "1";
-  const pageSize = 50;
+  const pageSize = 10;
 
   const { count, results } = await askell.get("/subscriptions/", {
     queries: {
