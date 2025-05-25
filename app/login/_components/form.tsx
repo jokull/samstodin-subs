@@ -43,7 +43,7 @@ export function Form() {
           <Link
             className="text-blue-500 underline"
             href={{
-              pathname: "/lykilord",
+              pathname: "/gleymt-lykilord",
             }}
           >
             Gleymt lykilorð?

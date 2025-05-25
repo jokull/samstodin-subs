@@ -31,20 +31,9 @@ export function Form({ token, email }: { token: string; email: string }) {
       </Link>
 
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Netfang
+        <label className="block font-semibold text-gray-900">
+          Veldu nýtt lykilorð fyrir {email}
         </label>
-        <div className="mt-1">
-          <input
-            id="email"
-            readOnly
-            value={email}
-            className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
-          />
-        </div>
       </div>
       <div>
         <label

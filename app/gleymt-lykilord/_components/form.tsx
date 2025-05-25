@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { Logo } from "~/components/Logo";
 
@@ -12,6 +12,7 @@ export function Form() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<null | string>(null);
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   return (
     <form
       onSubmit={(event) => {
@@ -20,12 +21,14 @@ export function Form() {
         const formData = new FormData(event.target as HTMLFormElement);
         const email = formData.get("email");
         if (typeof email === "string") {
-          void requestPassword(email).then((result) => {
-            if (result && "error" in result) {
-              setError(result.error);
-            } else {
-              setSuccess(true);
-            }
+          startTransition(() => {
+            void requestPassword(email).then((result) => {
+              if (result && "error" in result) {
+                setError(result.error);
+              } else {
+                setSuccess(true);
+              }
+            });
           });
         }
       }}
@@ -60,7 +63,8 @@ export function Form() {
 
       <button
         type="submit"
-        className="w-full rounded bg-neutral-950 px-4 py-2 text-white hover:bg-black focus:bg-neutral-900"
+        disabled={isPending}
+        className="w-full rounded bg-neutral-950 px-4 py-2 text-white hover:bg-black focus:bg-neutral-900 disabled:opacity-50"
       >
         Endurstilla lykilorð
       </button>

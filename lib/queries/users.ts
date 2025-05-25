@@ -51,6 +51,16 @@ export async function createUser({
 
 export async function updateUserPassword(user: User, password: string) {
   const hashedPassword = await bcrypt.hash(password, 10);
+  const row = await db.query.Password.findFirst({
+    where: eq(Password.userId, user.id),
+  });
+  if (!row) {
+    await db.insert(Password).values({
+      userId: user.id,
+      hash: hashedPassword,
+    });
+    return;
+  }
   await db
     .update(Password)
     .set({

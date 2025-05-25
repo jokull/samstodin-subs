@@ -15,7 +15,6 @@ export async function getSubscriptions(user: User) {
       params: { customerReference: user.kennitala },
     },
   );
-  console.log("subscriptions", subscriptions);
   return subscriptions;
 }
 

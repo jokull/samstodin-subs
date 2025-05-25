@@ -40,7 +40,7 @@ export default async function Page() {
         ) {
           return [];
         }
-        console.log(error);
+        console.error(error);
         return [];
       })
     : [];

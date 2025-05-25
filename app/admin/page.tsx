@@ -57,12 +57,6 @@ export default async function Page({
     { minDate: null, maxDate: null },
   );
 
-  console.log(
-    `Found ${subscriptions.length} subscriptions between ${minDate?.toLocaleDateString(
-      "is-IS",
-    )} and ${maxDate?.toLocaleDateString("is-IS")}`,
-  );
-
   const users = await db.query.User.findMany({
     where:
       minDate && maxDate
