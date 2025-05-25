@@ -29,7 +29,7 @@ export const User = sqliteTable(
     index("kennitala_idx").on(table.kennitala),
     index("created_at_idx").on(table.createdAt),
     index("updated_at_idx").on(table.updatedAt),
-  ]
+  ],
 );
 
 export const Password = sqliteTable("Password", {

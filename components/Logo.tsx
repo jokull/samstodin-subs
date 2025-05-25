@@ -1,6 +1,7 @@
 export function Logo() {
   return (
-    <div className="flex gap-4 items-center font-black text-3xl">
+    <div className="flex items-center gap-4 text-3xl font-black">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/samstodin-logo-black.svg"
         width={91 / 2}

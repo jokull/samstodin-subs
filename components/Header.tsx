@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export function Header({ user }: { user?: { email: string } }) {
+export function Header({ email }: { email?: string }) {
   return (
     <header className="flex w-full items-center justify-between gap-4 py-4 text-black">
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
@@ -22,9 +22,9 @@ export function Header({ user }: { user?: { email: string } }) {
         </a>
       </div>
       <div className="flex flex-col items-end sm:flex-row sm:items-center sm:gap-4">
-        {user ? (
+        {email ? (
           <>
-            <p>{user.email}</p>
+            <p>{email}</p>
             <form action="/logout" method="post">
               <button type="submit" className="underline">
                 Útskrá

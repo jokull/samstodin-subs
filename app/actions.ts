@@ -18,7 +18,7 @@ export async function subscribe(planId: string) {
       }&redirect=${encodeURIComponent(redirectUri)}`,
     );
   }
-  redirect("/askrift");
+  redirect("/");
 }
 
 export async function unsubscribe(subscriptionId: string) {
@@ -29,5 +29,7 @@ export async function unsubscribe(subscriptionId: string) {
   await askell.post("/subscriptions/:subscriptionId/cancel/", {} as never, {
     params: { subscriptionId },
   });
+  // Sleep 3 seconds
+  await new Promise((resolve) => setTimeout(resolve, 3000));
   revalidatePath("/");
 }

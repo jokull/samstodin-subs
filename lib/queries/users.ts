@@ -24,11 +24,10 @@ export async function createUser({
 }: {
   email: User["email"];
   name: string;
-  password: string;
+  password?: string;
   kennitala: string;
   althydufelagid: boolean;
 }) {
-  const hashedPassword = await bcrypt.hash(password, 10);
   const user = await db
     .insert(User)
     .values({
@@ -39,6 +38,10 @@ export async function createUser({
     })
     .returning()
     .get();
+  if (!password) {
+    return user;
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
   await db.insert(Password).values({
     userId: user.id,
     hash: hashedPassword,

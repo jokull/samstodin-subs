@@ -1,4 +1,4 @@
-import { and, countDistinct, desc, gte, lte } from "drizzle-orm";
+import { and, desc, gte, lte } from "drizzle-orm";
 import { getKennitalaBirthDate, parseKennitala } from "is-kennitala";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export default async function Page({
 }) {
   const user = await getSession(cookies().get("__session")?.value ?? "");
   if (!user || !user.isAdmin) {
-    redirect("/askrift");
+    redirect("/");
   }
 
   const page = searchParams.page ?? "1";
@@ -63,22 +63,16 @@ export default async function Page({
     )} and ${maxDate?.toLocaleDateString("is-IS")}`,
   );
 
-  const totalUsers = await db.select({count: countDistinct(User.id)}).from(User)
-  console.log(`Total users in database: ${totalUsers.join(', ')}`);
-
   const users = await db.query.User.findMany({
     where:
       minDate && maxDate
-        ? and(gte(User.createdAt, minDate), lte(User.createdAt, page === "1" ? new Date() : maxDate))
+        ? and(
+            gte(User.createdAt, minDate),
+            lte(User.createdAt, page === "1" ? new Date() : maxDate),
+          )
         : undefined,
     orderBy: desc(User.createdAt),
   });
-
-  console.log(
-    `Fetched ${users.length} users between ${minDate?.toLocaleDateString(
-      "is-IS",
-    )} and ${maxDate?.toLocaleDateString("is-IS")}`,
-  );
 
   const subscriptionUsers = users.map((user) => {
     const subscription = subscriptions.find(
@@ -89,7 +83,7 @@ export default async function Page({
 
   return (
     <div className="mx-auto flex h-full min-h-screen flex-col px-4 sm:px-6 lg:px-8">
-      <Header user={user} />
+      <Header email={user.email} />
 
       <div className="">
         <div className="mt-8 flow-root">

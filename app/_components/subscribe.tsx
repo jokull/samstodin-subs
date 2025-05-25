@@ -8,7 +8,7 @@ import { subscribe } from "../actions";
 import { Plan } from "../queries";
 
 export function Subscribe({ plans }: { plans: Plan[] }) {
-  const [plan, setPlan] = useState(plans[1]!);
+  const [plan, setPlan] = useState(plans[1] ?? null);
   return (
     <div>
       {plans.length === 0 ? (

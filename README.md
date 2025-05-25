@@ -26,7 +26,7 @@ bun run dev  # in another tab
 
 Template `.env.local`
 
-```
+```bash
 EXTERNAL_HOST="samstodin-subs.solberg.is"
 
 SESSION_SECRET=
@@ -46,7 +46,7 @@ SAMSTODIN_EMAIL_PASSWORD=
 
 Initialize the production db
 
-```
+```bash
 # signup with turso, install the turso cli
 turso db create samstodin-subs --from-dump seed.sql
 turso db show --url samstodin-subs  # for the prod `DATABASE_URL` value

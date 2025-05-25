@@ -22,7 +22,7 @@ export async function unsealVerificationToken(token: string) {
   return sessionSchema.parse({ email: unsealed }).email;
 }
 
-export async function getSession(token: string) {
+export async function getSealedEmail(token: string) {
   const data = await unsealData(token, {
     password: process.env.SESSION_SECRET ?? "",
   });
@@ -30,8 +30,13 @@ export async function getSession(token: string) {
   if (!result.success) {
     return undefined;
   }
+  return result.data.email;
+}
+
+export async function getSession(token: string) {
+  const email = await getSealedEmail(token);
   const user = await db.query.User.findFirst({
-    where: eq(User.email, result.data.email),
+    where: eq(User.email, email ?? ""),
   });
   return user;
 }

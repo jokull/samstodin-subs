@@ -77,7 +77,7 @@ export function Form() {
           <Link
             className="text-blue-500 underline"
             href={{
-              pathname: "/askrift",
+              pathname: "/",
               search: searchParams.toString(),
             }}
           >

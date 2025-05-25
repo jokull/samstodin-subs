@@ -3,19 +3,20 @@ import { askell } from "~/lib/api";
 import { User } from "../schema";
 
 export type Subscription = NonNullable<
-  Awaited<ReturnType<typeof getSubscription>>
->;
+  Awaited<ReturnType<typeof getSubscriptions>>
+>[number];
 
 export type Plan = Awaited<ReturnType<typeof getPlans>>[0];
 
-export async function getSubscription(user: User) {
+export async function getSubscriptions(user: User) {
   const subscriptions = await askell.get(
     "/customers/:customerReference/subscriptions/",
     {
       params: { customerReference: user.kennitala },
     },
   );
-  return subscriptions.find(({ active }) => active) ?? null;
+  console.log("subscriptions", subscriptions);
+  return subscriptions;
 }
 
 export async function getPlans() {

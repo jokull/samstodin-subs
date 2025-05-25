@@ -4,8 +4,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useFormState } from "react-dom";
 
-import { Logo } from "~/components/Logo";
-
 import { login } from "../actions";
 
 export function Form() {
@@ -22,9 +20,6 @@ export function Form() {
   );
   return (
     <form action={action}>
-      <Link href={{ pathname: "/" }} className="mb-4 block">
-        <Logo />
-      </Link>
       <div>
         <label
           htmlFor="email"
@@ -90,7 +85,7 @@ export function Form() {
           <Link
             className="text-blue-500 underline"
             href={{
-              pathname: "/askrift",
+              pathname: "/",
             }}
           >
             Stofna aðgang
