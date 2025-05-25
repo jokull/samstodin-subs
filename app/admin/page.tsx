@@ -38,7 +38,7 @@ export default async function Page({
   );
 
   // Use reduce to find the min and max dates
-  let { minDate, maxDate } = subscriptions.reduce(
+  const { minDate, maxDate } = subscriptions.reduce(
     (acc: { minDate: Date | null; maxDate: Date | null }, subscription) => {
       const { start_date } = subscription;
 
@@ -57,15 +57,10 @@ export default async function Page({
     { minDate: null, maxDate: null },
   );
 
-  // If page = 1 then set minDate to today
-  if (page === "1") {
-    maxDate = new Date();
-  }
-
   const users = await db.query.User.findMany({
     where:
       minDate && maxDate
-        ? and(gte(User.createdAt, minDate), lte(User.createdAt, maxDate))
+        ? and(gte(User.createdAt, minDate), lte(User.createdAt, page === "1" ? new Date() : maxDate))
         : undefined,
     orderBy: desc(User.createdAt),
   });
