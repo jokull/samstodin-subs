@@ -1,26 +1,36 @@
 import { createId } from "@paralleldrive/cuid2";
 import { relations } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const User = sqliteTable("User", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => createId())
-    .notNull(),
-  name: text("name").notNull(),
-  email: text("email").unique().notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp_ms" })
-    .$defaultFn(() => new Date())
-    .notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
-    .$defaultFn(() => new Date())
-    .notNull(),
-  kennitala: text("kennitala").unique().notNull(),
-  althydufelagid: integer("althydufelagid", { mode: "boolean" })
-    .default(true)
-    .notNull(),
-  isAdmin: integer("isAdmin", { mode: "boolean" }).default(false).notNull(),
-});
+export const User = sqliteTable(
+  "User",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId())
+      .notNull(),
+    name: text("name").notNull(),
+    email: text("email").unique().notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp_ms" })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    kennitala: text("kennitala").unique().notNull(),
+    althydufelagid: integer("althydufelagid", { mode: "boolean" })
+      .default(true)
+      .notNull(),
+    isAdmin: integer("isAdmin", { mode: "boolean" }).default(false).notNull(),
+  },
+  (table) => [
+    index("name_idx").on(table.name),
+    index("email_idx").on(table.email),
+    index("kennitala_idx").on(table.kennitala),
+    index("created_at_idx").on(table.createdAt),
+    index("updated_at_idx").on(table.updatedAt),
+  ]
+);
 
 export const Password = sqliteTable("Password", {
   hash: text("hash").notNull(),

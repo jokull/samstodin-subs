@@ -1,4 +1,4 @@
-import { and, desc, gte, lte } from "drizzle-orm";
+import { and, countDistinct, desc, gte, lte } from "drizzle-orm";
 import { getKennitalaBirthDate, parseKennitala } from "is-kennitala";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -57,6 +57,15 @@ export default async function Page({
     { minDate: null, maxDate: null },
   );
 
+  console.log(
+    `Found ${subscriptions.length} subscriptions between ${minDate?.toLocaleDateString(
+      "is-IS",
+    )} and ${maxDate?.toLocaleDateString("is-IS")}`,
+  );
+
+  const totalUsers = await db.select({count: countDistinct(User.id)}).from(User)
+  console.log(`Total users in database: ${totalUsers.join(', ')}`);
+
   const users = await db.query.User.findMany({
     where:
       minDate && maxDate
@@ -64,6 +73,12 @@ export default async function Page({
         : undefined,
     orderBy: desc(User.createdAt),
   });
+
+  console.log(
+    `Fetched ${users.length} users between ${minDate?.toLocaleDateString(
+      "is-IS",
+    )} and ${maxDate?.toLocaleDateString("is-IS")}`,
+  );
 
   const subscriptionUsers = users.map((user) => {
     const subscription = subscriptions.find(
