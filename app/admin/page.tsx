@@ -1,4 +1,4 @@
-import { and, desc, gte, lte } from "drizzle-orm";
+import { and, countDistinct, desc, gte, lte } from "drizzle-orm";
 import { getKennitalaBirthDate, parseKennitala } from "is-kennitala";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -60,6 +60,7 @@ export default async function Page({
   );
 
   console.log("🥕")
+  console.log(await db.select({ count: countDistinct(User.id) }).from(User));
   const users = await db.query.User.findMany({
     where:
       page !== "1" && minDate && maxDate
