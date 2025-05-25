@@ -67,6 +67,7 @@ export default async function Page({
         : undefined,
     orderBy: desc(User.createdAt),
   });
+  console.log("🥦")
 
   const subscriptionUsers = users.map((user) => {
     const subscription = subscriptions.find(
