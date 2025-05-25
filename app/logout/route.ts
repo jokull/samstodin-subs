@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "edge";
-
 // eslint-disable-next-line @typescript-eslint/require-await
 async function handler(request: NextRequest) {
   const rootUrl = new URL("/", request.headers.get("origin") ?? request.url);
