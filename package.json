@@ -17,6 +17,7 @@
     "@shopify/react-form": "^2.7.3",
     "@tailwindcss/forms": "^0.5.9",
     "@zodios/core": "^10.9.6",
+    "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.29.5",
     "iron-session": "^8.0.4",

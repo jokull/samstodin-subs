@@ -70,7 +70,7 @@ export function getSessionCookieSettings() {
   return {
     name: "__session",
     sameSite: "lax",
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     httpOnly: true,
     expires: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 365),
   } as const;
