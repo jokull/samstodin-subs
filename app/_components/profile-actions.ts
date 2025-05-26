@@ -22,7 +22,7 @@ export async function createProfile({
   name: string;
   password?: string;
 }) {
-  const email = await getSealedEmail(cookies().get("__session")?.value ?? "");
+  const email = await getSealedEmail((await cookies()).get("__session")?.value ?? "");
 
   if (!email) {
     redirect("/login");

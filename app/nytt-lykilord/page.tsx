@@ -4,11 +4,12 @@ import { getSession } from "~/lib/session";
 
 import { Form } from "./_components/form";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string, string>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const token = searchParams.token;
 
   if (!token) {

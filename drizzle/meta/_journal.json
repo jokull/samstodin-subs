@@ -15,6 +15,20 @@
       "when": 1748172944501,
       "tag": "0001_massive_amazoness",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1748255991258,
+      "tag": "0002_new_princess_powerful",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1748256841475,
+      "tag": "0003_rich_butterfly",
+      "breakpoints": true
     }
   ]
 }

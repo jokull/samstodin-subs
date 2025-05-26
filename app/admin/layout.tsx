@@ -7,7 +7,9 @@ import { getSession } from "~/lib/session";
 import Nav from "./_components/nav";
 
 export default async function Page({ children }: { children: ReactNode }) {
-  const user = await getSession(cookies().get("__session")?.value ?? "");
+  const user = await getSession(
+    (await cookies()).get("__session")?.value ?? "",
+  );
   if (!user || !user.isAdmin) {
     redirect("/");
   }
@@ -17,7 +19,7 @@ export default async function Page({ children }: { children: ReactNode }) {
       <header className="flex w-full items-center justify-between gap-4 py-4 text-black">
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
           <a
-            href="https://samstodin.is/"
+            href="https://askrift.samstodin.is/"
             className="flex items-center gap-2 text-xl font-black"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

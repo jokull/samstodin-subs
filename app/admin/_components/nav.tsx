@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useLinkStatus } from "next/link";
 
 function LoadingIndicator() {
   const { pending } = useLinkStatus();
   return pending ? (
-    <span className="inline-block w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin ml-1" />
+    <span className="ml-1 inline-block h-3 w-3 animate-spin rounded-full border border-gray-400 border-t-transparent" />
   ) : null;
 }
 

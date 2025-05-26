@@ -16,7 +16,7 @@ import { Subscription } from "./_components/subscription";
 import { getPlans, getSubscriptions } from "./queries";
 
 export default async function Page() {
-  const email = await getSealedEmail(cookies().get("__session")?.value ?? "");
+  const email = await getSealedEmail((await cookies()).get("__session")?.value ?? "");
 
   if (!email) {
     redirect("/login");

@@ -7,11 +7,10 @@ import { askell } from "~/lib/api";
 import { db } from "~/lib/db";
 import { User } from "~/schema";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string, string>>;
 }) {
+  const searchParams = await props.searchParams;
   const page = searchParams.page ?? "1";
   const pageSize = 50;
 
@@ -160,16 +159,28 @@ export default async function Page({
                   {createdAt.toLocaleDateString("is-IS")}
                 </td>
                 <td
-                  className={`whitespace-nowrap px-3 py-4 text-sm text-gray-500 underline ${
+                  className={`whitespace-nowrap px-3 py-4 text-sm text-gray-500 ${
                     subscription?.active ? "" : "text-red-600"
                   }`}
                 >
                   {subscription ? (
                     <Link
                       target="_blank"
+                      className="underline"
                       href={`https://askell.is/dashboard/customers/${subscription.customer.id}/`}
                     >
-                      {subscription.active ? "Virk" : "Óvirk"}
+                      {subscription.cancelled
+                        ? `${subscription.active ? "Rennur" : "Rann"} út ${subscription.active_until?.toLocaleDateString(
+                            "is-IS",
+                            {
+                              year: "numeric",
+                              month: "numeric",
+                              day: "numeric",
+                            },
+                          )}`
+                        : subscription.active
+                          ? "Virk"
+                          : "Óvirk"}
                     </Link>
                   ) : (
                     <span>Óskráður</span>

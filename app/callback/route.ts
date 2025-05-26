@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
   const payload = result.value;
 
-  cookies().set({
+  (await cookies()).set({
     value: await getSealedSession(payload.email),
     ...getSessionCookieSettings(),
   });

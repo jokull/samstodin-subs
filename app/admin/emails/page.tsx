@@ -4,11 +4,12 @@ import { Pagination } from "~/components/Pagination";
 import { db } from "~/lib/db";
 import { Email, User } from "~/schema";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string, string>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const page = searchParams.page ?? "1";
   const pageSize = 50;
 

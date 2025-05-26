@@ -7,7 +7,7 @@ export function Header({ email }: { email?: string }) {
     <header className="flex w-full items-center justify-between gap-4 py-4 text-black">
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
         <a
-          href="https://samstodin.is/"
+          href="https://askrift.samstodin.is/"
           className="flex items-center gap-2 text-xl font-black"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -30,7 +30,7 @@ export async function login(prevState: unknown, formData: FormData) {
   if (!user) {
     return { error: "Fann ekki notanda, eða lykilorð er ekki rétt" };
   }
-  cookies().set({
+  (await cookies()).set({
     value: await getSealedSession(user.email),
     ...getSessionCookieSettings(),
   });

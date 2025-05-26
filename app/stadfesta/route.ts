@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     await db.insert(Email).values({ email }).onConflictDoNothing();
 
-    cookies().set({
+    (await cookies()).set({
       value: await getSealedSession(email),
       ...getSessionCookieSettings(),
     });

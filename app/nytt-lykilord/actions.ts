@@ -22,7 +22,7 @@ export async function setPassword(password: string, token: string) {
 
   await updateUserPassword(user, password);
 
-  cookies().set({
+  (await cookies()).set({
     value: await getSealedSession(user.email),
     ...getSessionCookieSettings(),
   });
