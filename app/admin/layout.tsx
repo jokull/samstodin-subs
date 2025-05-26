@@ -10,7 +10,7 @@ export default async function Page({ children }: { children: ReactNode }) {
   const user = await getSession(
     (await cookies()).get("__session")?.value ?? "",
   );
-  if (!user || !user.isAdmin) {
+  if (!user?.isAdmin) {
     redirect("/");
   }
 

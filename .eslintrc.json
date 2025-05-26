@@ -11,7 +11,7 @@
   ],
 
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "import", "unicorn"],
+  "plugins": ["@typescript-eslint", "import"],
   "settings": {
     "import/resolver": {
       "typescript": {
