@@ -3,11 +3,18 @@
 import { useState } from "react";
 
 import { PlanPicker } from "~/components/PlanPicker";
+import { Subscription } from "~/lib/api";
 
 import { subscribe } from "../actions";
 import { Plan } from "../queries";
 
-export function Subscribe({ plans }: { plans: Plan[] }) {
+export function Subscribe({
+  plans,
+  activeButCancelledSubscription,
+}: {
+  plans: Plan[];
+  activeButCancelledSubscription?: Subscription;
+}) {
   const [plan, setPlan] = useState(plans[1] ?? null);
   return (
     <div>
@@ -37,6 +44,22 @@ export function Subscribe({ plans }: { plans: Plan[] }) {
           </div>
         </form>
       )}
+
+      {activeButCancelledSubscription?.active_until ? (
+        <div>
+          <p className="mt-8">
+            Þú ert með áskrift sem hefur verið stöðvuð og rennur út{" "}
+            {activeButCancelledSubscription.active_until.toLocaleDateString(
+              "is-IS",
+              {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              },
+            )}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -69,10 +69,11 @@ const BillingLog = z
 const Subscription = z
   .object({
     id: z.number().int(),
-    trial_end: z.string().datetime().nullable(),
-    start_date: z.string().datetime().nullable(),
-    ended_at: z.string().datetime().nullable(),
-    active_until: z.string().datetime(),
+    trial_end: z.coerce.date().nullable(),
+    start_date: z.coerce.date().nullable(),
+    ended_at: z.coerce.date().nullable(),
+    active_until: z.coerce.date(),
+    cancelled: z.boolean().default(false),
     reference: z.string(),
     description: z.string().nullable(),
     is_on_trial: z.boolean(),

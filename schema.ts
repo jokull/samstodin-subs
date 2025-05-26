@@ -37,6 +37,13 @@ export const Password = sqliteTable("Password", {
   userId: text("userId").notNull().unique(),
 });
 
+export const Email = sqliteTable("Email", {
+  email: text("email").primaryKey(),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" })
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Define relations
 export const userRelations = relations(User, ({ one }) => ({
   password: one(Password, {
@@ -59,6 +66,7 @@ export type Password = typeof Password.$inferSelect;
 export default {
   User,
   Password,
+  Email,
   userRelations,
   passwordRelations,
 };

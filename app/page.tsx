@@ -46,7 +46,13 @@ export default async function Page() {
     : [];
 
   const activeSubscription = subscriptions.find(
-    (subscription) => subscription.active === true,
+    (subscription) =>
+      subscription.active === true && subscription.cancelled === false,
+  );
+
+  const activeButCancelledSubscription = subscriptions.find(
+    (subscription) =>
+      subscription.active === true && subscription.cancelled === true,
   );
 
   return (
@@ -60,7 +66,10 @@ export default async function Page() {
         ) : activeSubscription ? (
           <Subscription subscription={activeSubscription} />
         ) : (
-          <Subscribe plans={await getPlans()} />
+          <Subscribe
+            plans={await getPlans()}
+            activeButCancelledSubscription={activeButCancelledSubscription}
+          />
         )}
       </main>
     </div>

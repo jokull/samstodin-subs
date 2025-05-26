@@ -1,8 +1,10 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { db } from "~/lib/db";
 import { getSealedSession, getSessionCookieSettings } from "~/lib/session";
 import { getSignup } from "~/lib/signup";
+import { Email } from "~/schema";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -24,6 +26,8 @@ export async function GET(request: NextRequest) {
     if (!email) {
       return NextResponse.json({ error: "Invalid token" }, { status: 400 });
     }
+
+    await db.insert(Email).values({ email }).onConflictDoNothing();
 
     cookies().set({
       value: await getSealedSession(email),

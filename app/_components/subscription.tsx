@@ -1,13 +1,16 @@
-"use client"
+"use client";
 
-
+import { useTransition } from "react";
 
 import { unsubscribe } from "../actions";
-import {
-  Subscription as SubscriptionType
-} from "../queries";
+import { Subscription as SubscriptionType } from "../queries";
 
-export function Subscription({ subscription }: { subscription: SubscriptionType }) {
+export function Subscription({
+  subscription,
+}: {
+  subscription: SubscriptionType;
+}) {
+  const [isPending, startTransition] = useTransition();
   return (
     <>
       <div className="mb-8 space-y-4">
@@ -29,12 +32,9 @@ export function Subscription({ subscription }: { subscription: SubscriptionType 
             {subscription.ended_at
               ? "Áskriftinni hefur verið hætt og rennur hún út"
               : "Áskriftin verður næst endurnýjuð sjálfkrafa"}{" "}
-            {new Date(Date.parse(subscription.active_until)).toLocaleDateString(
-              "is-IS",
-              {
-                dateStyle: "long",
-              },
-            )}
+            {subscription.active_until.toLocaleDateString("is-IS", {
+              dateStyle: "long",
+            })}
           </p>
         ) : null}
         <p className="mb-8">
@@ -54,12 +54,15 @@ export function Subscription({ subscription }: { subscription: SubscriptionType 
           </a>{" "}
           eða{" "}
           <button
-            className="underline"
+            className="underline disabled:opacity-50"
+            disabled={isPending}
             onClick={(event) => {
               event.preventDefault();
-              if (subscription.id) {
-                void unsubscribe(subscription.id.toString());
-              }
+              startTransition(() => {
+                if (subscription.id) {
+                  void unsubscribe(subscription.id.toString());
+                }
+              });
             }}
           >
             segja upp áskrift

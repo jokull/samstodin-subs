@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import { db } from "~/lib/db";
 import { getSealedSession, getSessionCookieSettings } from "~/lib/session";
+import { Email } from "~/schema";
 
 import { verifyGoogleCode } from "../google-auth";
 import { safeJsonParse, safeZodParse } from "../safe";
@@ -66,6 +68,13 @@ export async function GET(request: NextRequest) {
     value: await getSealedSession(payload.email),
     ...getSessionCookieSettings(),
   });
+
+  await db
+    .insert(Email)
+    .values({
+      email: payload.email,
+    })
+    .onConflictDoNothing();
 
   return NextResponse.redirect(
     `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}${redirectUrl ?? "/"}`,
