@@ -1,6 +1,7 @@
 "use server";
 
 import { KennitalaData } from "is-kennitala";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -22,7 +23,9 @@ export async function createProfile({
   name: string;
   password?: string;
 }) {
-  const email = await getSealedEmail((await cookies()).get("__session")?.value ?? "");
+  const email = await getSealedEmail(
+    (await cookies()).get("__session")?.value ?? "",
+  );
 
   if (!email) {
     redirect("/login");
@@ -47,5 +50,5 @@ export async function createProfile({
     password,
   });
 
-  return redirect("/");
+  revalidatePath("/");
 }

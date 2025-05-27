@@ -39,6 +39,7 @@ export const Password = sqliteTable("Password", {
 
 export const Email = sqliteTable("Email", {
   email: text("email").primaryKey(),
+  source: text("source", { enum: ["google", "password"] }),
   createdAt: integer("createdAt", { mode: "timestamp_ms" })
     .$defaultFn(() => new Date())
     .notNull(),

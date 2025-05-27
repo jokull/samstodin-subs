@@ -4,18 +4,20 @@ import { Pagination } from "~/components/Pagination";
 import { db } from "~/lib/db";
 import { Email, User } from "~/schema";
 
-export default async function Page(
-  props: {
-    searchParams: Promise<Record<string, string>>;
-  }
-) {
+export default async function Page(props: {
+  searchParams: Promise<Record<string, string>>;
+}) {
   const searchParams = await props.searchParams;
   const page = searchParams.page ?? "1";
   const pageSize = 50;
 
   // Drizzle query to find Emails that are not in Users
   const baseQuery = db
-    .select({ email: Email.email, createdAt: Email.createdAt })
+    .select({
+      email: Email.email,
+      createdAt: Email.createdAt,
+      source: Email.source,
+    })
     .from(Email)
     .where(
       notInArray(
@@ -41,7 +43,7 @@ export default async function Page(
           <tr>
             <th
               scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+              className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0"
             >
               Netfang
             </th>
@@ -51,17 +53,26 @@ export default async function Page(
             >
               Skráningardagur
             </th>
+            <th
+              scope="col"
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              Skráningarleið
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {results?.map(({ createdAt, email }) => {
+          {results?.map(({ createdAt, email, source }) => {
             return (
               <tr key={email}>
-                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
                   {email}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
                   {createdAt.toLocaleDateString("is-IS")}
+                </td>
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                  {source ?? "Óþekkt"}
                 </td>
               </tr>
             );

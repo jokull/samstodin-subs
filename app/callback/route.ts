@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
     .insert(Email)
     .values({
       email: payload.email,
+      source: "google",
     })
     .onConflictDoNothing();
 

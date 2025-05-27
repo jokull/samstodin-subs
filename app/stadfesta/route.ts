@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 400 });
     }
 
-    await db.insert(Email).values({ email }).onConflictDoNothing();
+    await db
+      .insert(Email)
+      .values({ email, source: "password" })
+      .onConflictDoNothing();
 
     (await cookies()).set({
       value: await getSealedSession(email),
