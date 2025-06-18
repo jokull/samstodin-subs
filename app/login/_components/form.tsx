@@ -83,10 +83,8 @@ export function Form() {
         <div className="text-right text-sm text-gray-500">
           <span className="hidden sm:inline">Ekki með aðgang? </span>
           <Link
-            className="text-blue-500 underline"
-            href={{
-              pathname: "/",
-            }}
+            className="text-blue-500 underline cursor-pointer hover:text-blue-700"
+            href="/signup"
           >
             Stofna aðgang
           </Link>
