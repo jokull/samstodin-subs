@@ -15,7 +15,7 @@ export default function Page() {
           <Logo />
         </Link>
         <button
-          className="relative my-8 flex w-full items-center justify-center gap-4 rounded border border-black/25 px-4 py-2 shadow-xl"
+          className="relative my-8 flex w-full items-center justify-center gap-4 rounded border border-black/25 px-4 py-2 shadow-xl cursor-pointer hover:bg-gray-50 transition-colors"
           type="button"
           onClick={() => {
             // starts a redirect flow
