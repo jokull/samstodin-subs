@@ -42,9 +42,7 @@
       "indexes": {
         "Password_userId_unique": {
           "name": "Password_userId_unique",
-          "columns": [
-            "userId"
-          ],
+          "columns": ["userId"],
           "isUnique": true
         }
       },
@@ -118,51 +116,37 @@
       "indexes": {
         "User_email_unique": {
           "name": "User_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         },
         "User_kennitala_unique": {
           "name": "User_kennitala_unique",
-          "columns": [
-            "kennitala"
-          ],
+          "columns": ["kennitala"],
           "isUnique": true
         },
         "name_idx": {
           "name": "name_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": false
         },
         "email_idx": {
           "name": "email_idx",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": false
         },
         "kennitala_idx": {
           "name": "kennitala_idx",
-          "columns": [
-            "kennitala"
-          ],
+          "columns": ["kennitala"],
           "isUnique": false
         },
         "created_at_idx": {
           "name": "created_at_idx",
-          "columns": [
-            "createdAt"
-          ],
+          "columns": ["createdAt"],
           "isUnique": false
         },
         "updated_at_idx": {
           "name": "updated_at_idx",
-          "columns": [
-            "updatedAt"
-          ],
+          "columns": ["updatedAt"],
           "isUnique": false
         }
       },

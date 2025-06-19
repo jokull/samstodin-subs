@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 
+import { env } from "~/env";
 import { getUserByEmail } from "~/lib/queries/users";
 import { sendEmail } from "~/lib/samstodin";
 import { getSealedSession } from "~/lib/session";
@@ -22,7 +23,7 @@ export async function requestPassword(email: string) {
     return { error: "Enginn notandi fannst með þetta netfang" };
   }
   const token = await getSealedSession(normalizedEmail);
-  const tokenUrl = `https://${process.env.EXTERNAL_HOST}/nytt-lykilord?token=${token}`;
+  const tokenUrl = `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/nytt-lykilord?token=${token}`;
   await sendEmail(
     normalizedEmail,
     "Endurstilla lykilorð",

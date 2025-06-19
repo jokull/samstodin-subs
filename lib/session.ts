@@ -3,6 +3,8 @@ import { eq } from "drizzle-orm";
 import { sealData, unsealData } from "iron-session";
 import { z } from "zod";
 
+import { env } from "~/env";
+
 import { Password, User } from "../schema";
 import { db } from "./db";
 
@@ -10,13 +12,13 @@ const sessionSchema = z.object({ email: z.string().email() });
 
 export async function getSealedSession(email: string) {
   return await sealData({ email } satisfies z.infer<typeof sessionSchema>, {
-    password: process.env.SESSION_SECRET!,
+    password: env.SESSION_SECRET,
   });
 }
 
 export async function unsealVerificationToken(token: string) {
   const unsealed = await unsealData(token, {
-    password: process.env.SESSION_SECRET!,
+    password: env.SESSION_SECRET,
     ttl: 60 * 60,
   });
   return sessionSchema.parse({ email: unsealed }).email;
@@ -24,7 +26,7 @@ export async function unsealVerificationToken(token: string) {
 
 export async function getSealedEmail(token: string) {
   const data = await unsealData(token, {
-    password: process.env.SESSION_SECRET ?? "",
+    password: env.SESSION_SECRET,
   });
   const result = sessionSchema.safeParse(data);
   if (!result.success) {

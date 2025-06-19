@@ -1,4 +1,4 @@
-import './lib/ensure-env.js';
+import "./lib/ensure-env.js";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {};

@@ -51,9 +51,7 @@
   "paths": {
     "/plans/": {
       "get": {
-        "tags": [
-          "Plan"
-        ],
+        "tags": ["Plan"],
         "summary": "Get a list of plans",
         "description": "Lists all plans. Requires a secret key.",
         "responses": {
@@ -80,9 +78,7 @@
     },
     "/transactions/{uuid}/receipt/": {
       "get": {
-        "tags": [
-          "Transaction"
-        ],
+        "tags": ["Transaction"],
         "parameters": [
           {
             "name": "uuid",
@@ -125,9 +121,7 @@
     },
     "/customers/": {
       "get": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Get a list of customers",
         "description": "Lists all customers. Requires a secret key.",
         "responses": {
@@ -155,9 +149,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Create a customer",
         "description": "Create a customer in Áskell. Requires a secret key. To make it easier linking customers to existing  systems, it is your responsibility to assign a reference to the customer so that you can look  them up later. This can be an id, a UUID or whatever suits you. It's best to keep it simple.\n",
         "requestBody": {
@@ -187,9 +179,7 @@
     },
     "/customers/{customerReference}/subscriptions/": {
       "get": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Get all subscriptions for a customer",
         "parameters": [
           {
@@ -228,9 +218,7 @@
     },
     "/customers/{customerReference}/subscriptions/add/": {
       "post": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Add subscription to a customer",
         "parameters": [
           {
@@ -272,9 +260,7 @@
     },
     "/customers/{customerReference}/": {
       "get": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Get a customer",
         "description": "Get a customer which has already been created. You need to supply your chosen customer reference. Requires a secret key.\n",
         "parameters": [
@@ -312,9 +298,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Update a customer",
         "description": "Update a customer which has already been created. You must supply all required fields. Requires a secret key.\n",
         "parameters": [
@@ -345,9 +329,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Delete a customer",
         "description": "Delete a customer. Requires a secret key.\n",
         "parameters": [
@@ -378,9 +360,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Partially update a customer",
         "description": "Update a customer which has already been created. All fields are optional. Requires a secret key.",
         "parameters": [
@@ -413,9 +393,7 @@
     },
     "/customers/paymentmethod/": {
       "post": {
-        "tags": [
-          "Customer"
-        ],
+        "tags": ["Customer"],
         "summary": "Add a payment method to customer.",
         "description": "Requires a secret key. You must first acquire a temporary payment method token using `/temporarypaymentmethod/` and use that in your post body.",
         "requestBody": {
@@ -455,9 +433,7 @@
     },
     "/subscriptions/": {
       "get": {
-        "tags": [
-          "Subscription"
-        ],
+        "tags": ["Subscription"],
         "summary": "Get all subscriptions",
         "responses": {
           "200": {
@@ -483,9 +459,7 @@
     },
     "/subscriptions/multi/": {
       "post": {
-        "tags": [
-          "Subscription"
-        ],
+        "tags": ["Subscription"],
         "summary": "Create multiple subscriptions",
         "requestBody": {
           "$ref": "#/components/requestBodies/Subscription"
@@ -521,9 +495,7 @@
     },
     "/subscriptions/{subscriptionId}/": {
       "get": {
-        "tags": [
-          "Subscription"
-        ],
+        "tags": ["Subscription"],
         "summary": "Get a single subscription",
         "parameters": [
           {
@@ -559,9 +531,7 @@
     },
     "/subscriptions/{subscriptionId}/cancel/": {
       "post": {
-        "tags": [
-          "Subscription"
-        ],
+        "tags": ["Subscription"],
         "summary": "Cancel a subscription",
         "parameters": [
           {
@@ -607,9 +577,7 @@
     },
     "/subscriptions/{subscriptionId}/activate/": {
       "post": {
-        "tags": [
-          "Subscription"
-        ],
+        "tags": ["Subscription"],
         "summary": "Activate a cancelled subscription. This will only work if the latest subscription billing period has not passed.",
         "parameters": [
           {
@@ -655,9 +623,7 @@
     },
     "/temporarypaymentmethod/": {
       "post": {
-        "tags": [
-          "Temporary payment method"
-        ],
+        "tags": ["Temporary payment method"],
         "summary": "Create a temporary payment method from a credit card",
         "description": "The resulting `token` is a reference to a temporary payment method. You have to confirm this payment method by e.g. using it to activate a subscription, or adding a new payment method to a customer. Requires a public api key. \n",
         "requestBody": {
@@ -694,9 +660,7 @@
     },
     "/temporarypaymentmethod/{token}/": {
       "get": {
-        "tags": [
-          "Temporary payment method"
-        ],
+        "tags": ["Temporary payment method"],
         "summary": "Check the status of a temporary payment methd token when dealing with 3D secure.",
         "parameters": [
           {
@@ -743,9 +707,7 @@
     },
     "/payments/": {
       "get": {
-        "tags": [
-          "Payment"
-        ],
+        "tags": ["Payment"],
         "summary": "Get a list of Payments",
         "description": "Lists all payments. Requires a secret key.",
         "responses": {
@@ -773,9 +735,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "Payment"
-        ],
+        "tags": ["Payment"],
         "summary": "Create a payment",
         "description": "Create a single payment in Áskell. Requires a secret key. A payment is executed asynchronously which means that you will have to rely on checking the status of the payment after creating it, or rely on webhooks. You can check the status of the payment using the uuid supplied when the payment is initially created.\n\nInitially, the payment will have the state 'pending'. If the payment is successful, the state will be 'settled'. If the payment fails, the state will be 'failed'.\n If you decide to retry the payment, the payment might have the state 'retrying'.\n\nTo summarize, the four states are:\n\n* pending\n* settled\n* failed\n* retrying\n\n",
         "requestBody": {
@@ -812,9 +772,7 @@
     },
     "/payments/{uuid}/retry/": {
       "post": {
-        "tags": [
-          "Payment"
-        ],
+        "tags": ["Payment"],
         "parameters": [
           {
             "name": "uuid",
@@ -857,9 +815,7 @@
     },
     "/your-webhook-url/": {
       "post": {
-        "tags": [
-          "Webhooks"
-        ],
+        "tags": ["Webhooks"],
         "summary": "Called when subscription changed or renewed",
         "description": "We recommend that you verify all calls from us to your webhook endpoints. We sign each request with the `Hook-HMAC` header. The value is a HMAC digest derived from the body of the request and a secret key only known by the API and you. We also supply the type of event in the `Hook-Event` header.\n\nHere is a sample implementation in Python. This process is very similar to the one Shopify uses so more information can possibly be gleaned from their [documentation](https://shopify.dev/tutorials/manage-webhooks#verify-webhook).\n```\nimport base64\nimport hmac\nimport hashlib\n\nWEBHOOK_SECRET = \"Your webhook secret\".encode()\nWEBHOOK_DIGEST_TYPE = 'sha512'\n\ndef verify(hmac_header, digest_method, secret, message):\n   digestmod = getattr(hashlib, digest_method)\n   signed = base64.b64encode(\n       hmac.new(secret, message, digestmod).digest(),\n   ).strip()\n   return hmac.compare_digest(signed, hmac_header)\n\n# your view function\ndef handle_webhook(request):\n   # The signature\n   digest = request.META.get('HTTP_HOOK_HMAC').encode()\n   # The name of the webhook event\n   event = request.META.get('HTTP_HOOK_EVENT').encode()\n\n   body = request.body\n   if verify(digest, WEBHOOK_DIGEST_TYPE, WEBHOOK_SECRET, body):\n       payload = json.loads(body)\n       # ... the rest of your code here```\n",
         "requestBody": {
@@ -997,10 +953,7 @@
         }
       },
       "CustomerAddPaymentMethod": {
-        "required": [
-          "customer_reference",
-          "token"
-        ],
+        "required": ["customer_reference", "token"],
         "type": "object",
         "properties": {
           "customer_reference": {
@@ -1014,12 +967,7 @@
         }
       },
       "CustomerCreate": {
-        "required": [
-          "customer_reference",
-          "email",
-          "first_name",
-          "last_name"
-        ],
+        "required": ["customer_reference", "email", "first_name", "last_name"],
         "type": "object",
         "properties": {
           "first_name": {
@@ -1091,12 +1039,7 @@
           "state": {
             "type": "string",
             "example": "settled",
-            "enum": [
-              "failed",
-              "settled",
-              "pending",
-              "retrying"
-            ]
+            "enum": ["failed", "settled", "pending", "retrying"]
           },
           "created_at": {
             "type": "string",
@@ -1138,12 +1081,7 @@
           "state": {
             "type": "string",
             "example": "pending",
-            "enum": [
-              "failed",
-              "settled",
-              "pending",
-              "retrying"
-            ]
+            "enum": ["failed", "settled", "pending", "retrying"]
           },
           "created_at": {
             "type": "string",
@@ -1163,11 +1101,7 @@
       },
       "PaymentCreate": {
         "type": "object",
-        "required": [
-          "customer_reference",
-          "amount",
-          "currency"
-        ],
+        "required": ["customer_reference", "amount", "currency"],
         "properties": {
           "customer_reference": {
             "type": "string",
@@ -1304,10 +1238,7 @@
           },
           "billing_log_type": {
             "type": "string",
-            "enum": [
-              "trial",
-              "renewal"
-            ]
+            "enum": ["trial", "renewal"]
           },
           "billing_date": {
             "type": "string",
@@ -1362,10 +1293,7 @@
       },
       "SubscriptionCreate": {
         "type": "object",
-        "required": [
-          "plan",
-          "reference"
-        ],
+        "required": ["plan", "reference"],
         "properties": {
           "plan": {
             "type": "integer",

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import { env } from "~/env";
 import { db } from "~/lib/db";
 import { getSealedSession, getSessionCookieSettings } from "~/lib/session";
 import { Email } from "~/schema";
@@ -40,16 +41,13 @@ export async function GET(request: NextRequest) {
     redirectUrl = null;
   }
 
-  const result = await verifyGoogleCode(
-    code,
-    process.env.GOOGLE_AUTH_CLIENT_SECRET!,
-  );
+  const result = await verifyGoogleCode(code, env.GOOGLE_AUTH_CLIENT_SECRET);
 
   if (result.isErr()) {
     if (result.error.type === "auth") {
       const errorUrl = new URL(
         "/auth/error",
-        `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}`,
+        `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`,
       );
       errorUrl.searchParams.set("error", result.error.message);
       return NextResponse.redirect(errorUrl);
@@ -78,6 +76,6 @@ export async function GET(request: NextRequest) {
     .onConflictDoNothing();
 
   return NextResponse.redirect(
-    `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}${redirectUrl ?? "/"}`,
+    `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}${redirectUrl ?? "/"}`,
   );
 }

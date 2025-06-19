@@ -15,7 +15,7 @@ export default function Page() {
           <Logo />
         </Link>
         <button
-          className="relative my-8 flex w-full items-center justify-center gap-4 rounded border border-black/25 px-4 py-2 shadow-xl cursor-pointer hover:bg-gray-50 transition-colors"
+          className="relative my-8 flex w-full cursor-pointer items-center justify-center gap-4 rounded border border-black/25 px-4 py-2 shadow-xl transition-colors hover:bg-gray-50"
           type="button"
           onClick={() => {
             // starts a redirect flow
@@ -49,7 +49,7 @@ export default function Page() {
               <path fill="none" d="M0 0h48v48H0z"></path>
             </svg>
           </div>
-          <span className="font-medium leading-loose">Google Innskráning</span>
+          <span className="leading-loose font-medium">Google Innskráning</span>
         </button>
         <div className="my-8 text-center">— eða —</div>
         <Form />

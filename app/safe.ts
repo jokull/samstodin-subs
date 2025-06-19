@@ -1,7 +1,5 @@
-import { err, ok } from "neverthrow";
+import { err, ok, Result, ResultAsync } from "neverthrow";
 import { z } from "zod";
-
-import { Result, ResultAsync } from "neverthrow";
 import type { ZodError, ZodSchema } from "zod";
 
 export type FetchError<E> = NetworkError | HttpError<E> | ParseError;
@@ -23,7 +21,6 @@ export interface ParseError {
   type: "parse";
   error: Error;
 }
-
 
 export interface ZodParseError<T> {
   type: "zod";
@@ -47,7 +44,6 @@ export function safeZodParse<TSchema extends ZodSchema<any>>(
         });
   };
 }
-
 
 export function safeFetch<T = unknown, E = unknown>(
   input: URL | string,
@@ -85,8 +81,9 @@ export function safeFetch<T = unknown, E = unknown>(
   });
 }
 
+interface JSONParseError {
+  message: string;
+}
+const toParseError = (): JSONParseError => ({ message: "Parse Error" });
 
-interface JSONParseError { message: string }
-const toParseError = (): JSONParseError => ({ message: "Parse Error" })
-
-export const safeJsonParse = Result.fromThrowable(JSON.parse, toParseError)
+export const safeJsonParse = Result.fromThrowable(JSON.parse, toParseError);

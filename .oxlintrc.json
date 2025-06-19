@@ -1,0 +1,9 @@
+{
+  "plugins": ["react", "nextjs"],
+  "rules": {
+    "correctness": "error",
+    "perf": "error",
+    "suspicious": "error",
+    "nextjs/no-img-element": "off"
+  }
+}
