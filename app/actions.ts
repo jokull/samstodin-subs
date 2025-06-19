@@ -4,13 +4,15 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { env } from "~/env";
 import { askell } from "~/lib/api";
 import { getSession } from "~/lib/session";
 
 export async function subscribe(planId: string) {
-  const user = await getSession((await cookies()).get("__session")?.value ?? "");
-  const externalDomain = process.env.EXTERNAL_HOST ?? "localhost";
-  const redirectUri = `https://${externalDomain}/`;
+  const user = await getSession(
+    (await cookies()).get("__session")?.value ?? "",
+  );
+  const redirectUri = `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/`;
   if (user) {
     redirect(
       `https://askell.is/subscribe-button/${planId}/?reference=${
@@ -22,7 +24,9 @@ export async function subscribe(planId: string) {
 }
 
 export async function unsubscribe(subscriptionId: string) {
-  const user = await getSession((await cookies()).get("__session")?.value ?? "");
+  const user = await getSession(
+    (await cookies()).get("__session")?.value ?? "",
+  );
   if (!user) {
     return;
   }

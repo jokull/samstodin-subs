@@ -8,6 +8,8 @@ import {
 import { err, ok } from "neverthrow";
 import { z } from "zod";
 
+import { env } from "~/env";
+
 import { safeFetch, safeZodParse } from "./safe";
 
 const tokenResponseSchema = z.object({
@@ -27,7 +29,7 @@ const googleIdTokenPayloadSchema = z.object({
   picture: z.string().url().optional(),
 });
 
-const REDIRECT_URI = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL!}/callback`;
+const REDIRECT_URI = `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/callback`;
 
 const oauth_google = {
   endpoint: "https://accounts.google.com/o/oauth2/v2/auth",
@@ -37,7 +39,7 @@ const oauth_google = {
 export function getGoogleAuthUrl({ redirect }: { redirect?: string }) {
   const url = new URL(oauth_google.endpoint);
   const params = new URLSearchParams({
-    client_id: process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID!,
+    client_id: env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID,
     redirect_uri: REDIRECT_URI,
     response_type: "code",
     scope: oauth_google.scopes.join(" "),
@@ -58,7 +60,7 @@ export function verifyGoogleCode(code: string, secret: string) {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID!,
+      client_id: env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID,
       client_secret: secret,
       code,
       grant_type: "authorization_code",

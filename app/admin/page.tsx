@@ -72,7 +72,7 @@ export default async function Page(props: {
           <tr>
             <th
               scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+              className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0"
             >
               Nafn
             </th>
@@ -114,7 +114,7 @@ export default async function Page(props: {
             </th>
             <th
               scope="col"
-              className="relative py-3.5 pl-3 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-0"
+              className="relative py-3.5 pr-4 pl-3 text-left text-sm font-semibold text-gray-900 sm:pr-0"
             >
               Alþýðufélag
             </th>
@@ -135,31 +135,31 @@ export default async function Page(props: {
 
             return (
               <tr key={user.id}>
-                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
                   {user.name}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
                   {kennitala?.formatted ?? user.kennitala}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
                   {user.email}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm tabular-nums text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 tabular-nums">
                   {kennitala
                     ? getKennitalaBirthDate(kennitala.value)?.getUTCFullYear()
                     : undefined}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
                   {settledTransactions[0]?.transaction?.amount
                     ? settledTransactions[0]?.transaction.amount.split(".")[0] +
                       " kr."
                     : null}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
                   {createdAt.toLocaleDateString("is-IS")}
                 </td>
                 <td
-                  className={`whitespace-nowrap px-3 py-4 text-sm text-gray-500 ${
+                  className={`px-3 py-4 text-sm whitespace-nowrap text-gray-500 ${
                     subscription?.active ? "" : "text-red-600"
                   }`}
                 >
@@ -186,7 +186,7 @@ export default async function Page(props: {
                     <span>Óskráður</span>
                   )}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
                   {user?.althydufelagid ? "✓" : null}
                 </td>
               </tr>

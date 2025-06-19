@@ -26,7 +26,7 @@ export function Pagination({
           className={`rounded border border-blue-500 px-3 py-1 ${
             page === index + 1
               ? "bg-blue-500 text-white"
-              : "bg-white text-blue-500 "
+              : "bg-white text-blue-500"
           }`}
         >
           {index + 1}

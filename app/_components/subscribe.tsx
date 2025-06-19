@@ -37,7 +37,7 @@ export function Subscribe({
             <PlanPicker plan={plan} plans={plans} setPlan={setPlan} />
             <button
               type="submit"
-              className="font-white grow rounded-md border-[1.5px] border-black bg-black px-4 pb-1.5 pt-2 text-white shadow-black/5 hover:shadow-lg"
+              className="font-white grow cursor-pointer rounded-md border-[1.5px] border-black bg-black px-4 pt-2 pb-1.5 text-white shadow-black/5 hover:opacity-90 hover:shadow-lg"
             >
               Áfram
             </button>

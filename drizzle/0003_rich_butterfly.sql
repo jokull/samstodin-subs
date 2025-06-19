@@ -1,0 +1,1 @@
+ALTER TABLE `Email` ADD `createdAt` integer NOT NULL;

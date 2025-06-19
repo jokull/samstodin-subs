@@ -22,7 +22,6 @@ export default async function Page({ children }: { children: ReactNode }) {
             href="https://askrift.samstodin.is/"
             className="flex items-center gap-2 text-xl font-black"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/samstodin-logo-black.svg"
               width={91 / 3}

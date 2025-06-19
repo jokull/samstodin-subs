@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
+import { env } from "~/env";
+
 import "./global.css";
 
 export const viewport: Viewport = {
@@ -10,7 +12,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Samstöðin Áskriftir",
-  metadataBase: new URL(`https://${process.env.EXTERNAL_HOST}/`),
+  metadataBase: new URL(
+    `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`,
+  ),
 };
 
 export default function RootLayout({

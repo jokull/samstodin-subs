@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 "use client";
 
 import { notEmptyString, useField, useForm } from "@shopify/react-form";
@@ -127,7 +126,6 @@ export function ProfileForm() {
               type="checkbox"
               name="althydufelagid"
               checked={fields.althydufelagid.value}
-              // eslint-disable-next-line @typescript-eslint/unbound-method
               onChange={fields.althydufelagid.onChange}
             />
             <span className="leading-relaxed">

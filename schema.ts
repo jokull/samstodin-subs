@@ -63,11 +63,12 @@ export const passwordRelations = relations(Password, ({ one }) => ({
 export type User = typeof User.$inferSelect;
 export type Password = typeof Password.$inferSelect;
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default {
+const schema = {
   User,
   Password,
   Email,
   userRelations,
   passwordRelations,
 };
+
+export default schema;
