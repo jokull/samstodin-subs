@@ -30,7 +30,7 @@ export function PlanPicker({
         <Radio
           key={id}
           value={id!.toString()}
-          className="selected:bg-black selected:text-white rounded-md border-[1.5px] border-black bg-white px-4 pt-2 pb-1.5 font-black shadow-black/5 transition-transform hover:-translate-y-0.5 hover:scale-105 hover:shadow-lg"
+          className="cursor-pointer rounded-md border-[1.5px] border-black bg-white px-4 pt-2 pb-1.5 font-black shadow-black/5 transition-transform hover:-translate-y-0.5 hover:scale-105 data-[selected]:bg-black data-[selected]:text-white"
         >
           <Label>{formatCurrencyIcelandic(amount!)}</Label>
         </Radio>
