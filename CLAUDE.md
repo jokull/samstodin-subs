@@ -52,3 +52,16 @@ pnpm db:studio          # Open Drizzle Studio
 - **Server Actions**: Form submissions and mutations
 - **Type Safety**: End-to-end with TypeScript + Drizzle + T3 Env
 - **Error Handling**: Result types with neverthrow for robust error management
+
+## Environment Variables
+
+Type-safe environment variables with T3 Env. To add new environment variables:
+
+1. **Add to `.env`**: `NEW_VAR=value`
+2. **Add to `env.ts`**:
+   - Server vars: Add to `server` object with Zod validation
+   - Client vars: Add to `client` object (must start with `NEXT_PUBLIC_`)
+   - Map in `runtimeEnv`: `NEW_VAR: process.env.NEW_VAR`
+3. **Import**: `import { env } from "~/env"` and use `env.NEW_VAR`
+
+The schema is validated at build time, so invalid/missing vars will fail the build.
