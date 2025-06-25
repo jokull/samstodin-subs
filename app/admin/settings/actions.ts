@@ -45,3 +45,31 @@ export async function updateOpenGraphImage(imageUrl: string | null) {
 
   revalidatePath("/admin/settings");
 }
+
+export async function updateHeroImage(imageUrl: string | null) {
+  await ensureAdmin();
+
+  const existingSetting = await db
+    .select()
+    .from(Settings)
+    .where(eq(Settings.key, "hero_image_url"))
+    .limit(1);
+
+  if (existingSetting.length > 0) {
+    await db
+      .update(Settings)
+      .set({
+        value: imageUrl,
+        updatedAt: new Date(),
+      })
+      .where(eq(Settings.key, "hero_image_url"));
+  } else {
+    await db.insert(Settings).values({
+      key: "hero_image_url",
+      value: imageUrl,
+      updatedAt: new Date(),
+    });
+  }
+
+  revalidatePath("/admin/settings");
+}

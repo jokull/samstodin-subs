@@ -10,3 +10,11 @@ export const getOpenGraphImage = cache(async (): Promise<string | null> => {
   
   return setting?.value || null;
 });
+
+export const getHeroImage = cache(async (): Promise<string | null> => {
+  const setting = await db.query.Settings.findFirst({
+    where: eq(Settings.key, "hero_image_url"),
+  });
+  
+  return setting?.value || null;
+});

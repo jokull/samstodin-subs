@@ -12,7 +12,7 @@ export default function LoginContent() {
   return (
     <>
       <button
-        className="relative my-8 flex w-full cursor-pointer items-center justify-center gap-4 rounded border border-black/25 px-4 py-2 shadow-xl transition-colors hover:bg-gray-50"
+        className="relative mb-6 flex w-full cursor-pointer items-center justify-center gap-4 rounded border border-black/25 px-4 py-2 shadow-xl transition-colors hover:bg-gray-50"
         type="button"
         onClick={() => {
           // starts a redirect flow
@@ -48,7 +48,7 @@ export default function LoginContent() {
         </div>
         <span className="leading-loose font-medium">Google Innskráning</span>
       </button>
-      <div className="my-8 text-center">— eða —</div>
+      <div className="my-6 text-center text-gray-600">— eða —</div>
       <Form redirectTo={redirectTo} />
     </>
   );
