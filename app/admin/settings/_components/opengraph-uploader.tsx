@@ -2,26 +2,33 @@
 
 import { UploadButton } from "@uploadthing/react";
 import { useState } from "react";
+
 import { type OurFileRouter } from "~/lib/uploadthing";
+
 import { updateOpenGraphImage } from "../actions";
 
 interface OpenGraphUploaderProps {
   initialImageUrl: string | null;
 }
 
-export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploaderProps) {
-  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(initialImageUrl);
+export default function OpenGraphUploader({
+  initialImageUrl,
+}: OpenGraphUploaderProps) {
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(
+    initialImageUrl,
+  );
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (pendingImageUrl) {
       setIsConfirming(true);
-      await updateOpenGraphImage(pendingImageUrl);
-      setCurrentImageUrl(pendingImageUrl);
-      setPendingImageUrl(null);
-      setIsConfirming(false);
+      void updateOpenGraphImage(pendingImageUrl).then(() => {
+        setCurrentImageUrl(pendingImageUrl);
+        setPendingImageUrl(null);
+        setIsConfirming(false);
+      });
     }
   };
 
@@ -29,10 +36,11 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
     setPendingImageUrl(null);
   };
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (confirm("Ertu viss um að þú vilt fjarlægja þessa mynd?")) {
-      await updateOpenGraphImage(null);
-      setCurrentImageUrl(null);
+      void updateOpenGraphImage(null).then(() => {
+        setCurrentImageUrl(null);
+      });
     }
   };
 
@@ -41,7 +49,9 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
       {/* Current Image */}
       {currentImageUrl && (
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-2">Núverandi mynd</h4>
+          <h4 className="mb-2 text-sm font-medium text-gray-900">
+            Núverandi mynd
+          </h4>
           <div className="relative">
             <img
               src={currentImageUrl}
@@ -53,8 +63,18 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
               className="absolute top-2 right-2 rounded-full bg-red-500 p-1 text-white shadow-sm hover:bg-red-600"
               title="Fjarlægja mynd"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -64,7 +84,9 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
       {/* Pending Image */}
       {pendingImageUrl && (
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-2">Ný mynd - bíður staðfestingar</h4>
+          <h4 className="mb-2 text-sm font-medium text-gray-900">
+            Ný mynd - bíður staðfestingar
+          </h4>
           <div className="relative">
             <img
               src={pendingImageUrl}
@@ -78,8 +100,18 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
                 className="rounded-full bg-green-500 p-1 text-white shadow-sm hover:bg-green-600 disabled:opacity-50"
                 title="Staðfesta nýju mynd"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </button>
               <button
@@ -88,20 +120,31 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
                 className="rounded-full bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 disabled:opacity-50"
                 title="Hætta við"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
           </div>
-          <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+          <div className="mt-2 rounded-lg bg-blue-50 p-3">
             <p className="text-sm text-blue-800">
-              <strong>Staðfestu:</strong> Þessi mynd mun koma í stað núverandi myndar.
+              <strong>Staðfestu:</strong> Þessi mynd mun koma í stað núverandi
+              myndar.
             </p>
           </div>
         </div>
       )}
-      
+
       {/* Upload Button */}
       {!pendingImageUrl && (
         <div>
@@ -121,13 +164,14 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
               setIsUploading(true);
             }}
             appearance={{
-              button: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm disabled:opacity-50",
+              button:
+                "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm disabled:opacity-50",
               allowedContent: "text-sm text-gray-500 mt-2",
             }}
           />
-          
+
           {isUploading && (
-            <div className="mt-2 text-sm text-gray-500 flex items-center gap-2">
+            <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
               Hleður upp mynd...
             </div>
@@ -136,7 +180,7 @@ export default function OpenGraphUploader({ initialImageUrl }: OpenGraphUploader
       )}
 
       {isConfirming && (
-        <div className="text-sm text-gray-500 flex items-center gap-2">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent"></div>
           Vistar breytingar...
         </div>
