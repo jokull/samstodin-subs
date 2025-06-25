@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { Logo } from "~/components/Logo";
 
@@ -8,6 +9,8 @@ import { startGoogleAuthFlow } from "../_components/signup-actions";
 import { Form } from "./_components/form";
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="flex min-h-full flex-col justify-center">
@@ -19,7 +22,7 @@ export default function Page() {
           type="button"
           onClick={() => {
             // starts a redirect flow
-            void startGoogleAuthFlow();
+            void startGoogleAuthFlow(redirectTo || undefined);
           }}
         >
           <div className="-mt-0.5">
@@ -52,7 +55,7 @@ export default function Page() {
           <span className="leading-loose font-medium">Google Innskráning</span>
         </button>
         <div className="my-8 text-center">— eða —</div>
-        <Form />
+        <Form redirectTo={redirectTo} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { env } from "~/env";
+import { getOpenGraphImage } from "~/lib/metadata";
 
 import "./global.css";
 
@@ -10,12 +11,40 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export const metadata: Metadata = {
-  title: "Samstöðin Áskriftir",
-  metadataBase: new URL(
-    `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`,
-  ),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const openGraphImageUrl = await getOpenGraphImage();
+
+  console.log(openGraphImageUrl);
+
+  return {
+    title: "Samstöðin Áskriftir",
+    description: "Gerðu þig að áskrifanda að Samstöðinni",
+    metadataBase: new URL(
+      `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`,
+    ),
+    openGraph: {
+      title: "Samstöðin Áskriftir",
+      description: "Gerðu þig að áskrifanda að Samstöðinni",
+      siteName: "Samstöðin",
+      images: openGraphImageUrl
+        ? [
+            {
+              url: openGraphImageUrl,
+              width: 1200,
+              height: 630,
+              alt: "Samstöðin",
+            },
+          ]
+        : ["/opengraph-image"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Samstöðin Áskriftir",
+      description: "Gerðu þig að áskrifanda að Samstöðinni",
+      images: openGraphImageUrl ? [openGraphImageUrl] : ["/opengraph-image"],
+    },
+  };
+}
 
 export default function RootLayout({
   children,

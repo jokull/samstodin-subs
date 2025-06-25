@@ -32,6 +32,14 @@ export default function Nav() {
             Netföng <LoadingIndicator />
           </Link>
         </li>
+        <li>
+          <Link
+            href="/admin/settings"
+            className={pathname === "/admin/settings" ? "underline" : ""}
+          >
+            Stillingar <LoadingIndicator />
+          </Link>
+        </li>
       </ul>
     </nav>
   );

@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -11,7 +11,9 @@ export default async function Page({ children }: { children: ReactNode }) {
     (await cookies()).get("__session")?.value ?? "",
   );
   if (!user?.isAdmin) {
-    redirect("/");
+    const headersList = await headers();
+    const pathname = headersList.get("x-pathname") || "/admin";
+    redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
 
   return (

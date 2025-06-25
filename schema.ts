@@ -45,6 +45,18 @@ export const Email = sqliteTable("Email", {
     .notNull(),
 });
 
+export const Settings = sqliteTable("Settings", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId())
+    .notNull(),
+  key: text("key").unique().notNull(),
+  value: text("value"),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Define relations
 export const userRelations = relations(User, ({ one }) => ({
   password: one(Password, {
@@ -62,11 +74,13 @@ export const passwordRelations = relations(Password, ({ one }) => ({
 
 export type User = typeof User.$inferSelect;
 export type Password = typeof Password.$inferSelect;
+export type Settings = typeof Settings.$inferSelect;
 
 const schema = {
   User,
   Password,
   Email,
+  Settings,
   userRelations,
   passwordRelations,
 };

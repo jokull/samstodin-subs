@@ -12,6 +12,7 @@ export const env = createEnv({
     SAMSTODIN_EMAIL_ADDRESS: z.string().email(),
     SAMSTODIN_EMAIL_PASSWORD: z.string().min(1),
     GOOGLE_AUTH_CLIENT_SECRET: z.string().min(1),
+    UPLOADTHING_TOKEN: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: z.string().min(1),
@@ -31,5 +32,6 @@ export const env = createEnv({
     NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID:
       process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID,
     GOOGLE_AUTH_CLIENT_SECRET: process.env.GOOGLE_AUTH_CLIENT_SECRET,
+    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
   },
 });

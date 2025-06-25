@@ -6,12 +6,16 @@ import { useFormState } from "react-dom";
 
 import { login } from "../actions";
 
-export function Form() {
+interface FormProps {
+  redirectTo?: string | null;
+}
+
+export function Form({ redirectTo }: FormProps) {
   const [state, action] = useFormState(
     (prevState: unknown, formData: FormData) => {
       return login(prevState, formData).then((result) => {
         if (result === null) {
-          redirect("/");
+          redirect(redirectTo || "/");
         }
         return result;
       });

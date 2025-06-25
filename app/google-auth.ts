@@ -47,8 +47,9 @@ export function getGoogleAuthUrl({ redirect }: { redirect?: string }) {
 
   // If you want to pass a custom redirect or other info, put it in 'state'
   if (redirect) {
-    const encodedRedirect: Uint8Array = new TextEncoder().encode(redirect);
-    params.set("state", encodeBase64url(encodedRedirect));
+    const stateObject = { redirect };
+    const encodedState: Uint8Array = new TextEncoder().encode(JSON.stringify(stateObject));
+    params.set("state", encodeBase64url(encodedState));
   }
 
   url.search = params.toString();
