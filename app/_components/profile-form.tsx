@@ -21,7 +21,7 @@ export function useProfileFields() {
         }
       },
     }),
-    althydufelagid: useField(true),
+    althydufelagid: useField(false),
     name: useField({ value: "", validates: notEmptyString("Nafn vantar") }),
   } as const;
 }
@@ -120,18 +120,26 @@ export function ProfileForm() {
             </div>
           </div>
 
-          <label className="flex items-baseline gap-2 hover:cursor-pointer">
-            <input
-              className="h-4 w-4"
-              type="checkbox"
-              name="althydufelagid"
-              checked={fields.althydufelagid.value}
-              onChange={fields.althydufelagid.onChange}
-            />
-            <span className="leading-relaxed">
-              Ég vil vera félagi í Alþýðufélaginu
-            </span>
-          </label>
+          <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+            <label className="flex items-start gap-3 hover:cursor-pointer">
+              <input
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                type="checkbox"
+                name="althydufelagid"
+                checked={fields.althydufelagid.value}
+                onChange={fields.althydufelagid.onChange}
+              />
+              <div className="leading-relaxed">
+                <div className="font-medium text-gray-900">
+                  Ég vil vera félagi í Alþýðufélaginu
+                </div>
+                <div className="text-sm text-gray-600">
+                  Valfrjálst - þú getur stutt Samstöðina án þess að vera í
+                  Alþýðufélaginu
+                </div>
+              </div>
+            </label>
+          </div>
 
           {submitErrors[0] ? (
             <div className="pt-1 text-red-700">{submitErrors[0].message}</div>
