@@ -76,6 +76,9 @@ export async function GET(request: NextRequest) {
     .onConflictDoNothing();
 
   return NextResponse.redirect(
-    `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}${redirectUrl ?? "/"}`,
+    new URL(
+      redirectUrl ?? "/",
+      `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`,
+    ),
   );
 }
