@@ -40,3 +40,7 @@ data.sqld
 db_dump.sql
 
 ./.env
+
+*.db
+*.db-wal
+*.db-shm

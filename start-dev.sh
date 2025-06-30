@@ -9,6 +9,7 @@ tmux set -t samstodin history-limit 10000
 
 # Create additional windows (tabs) for other commands
 tmux new-window -t samstodin -n next 'bun run dev'
+tmux new-window -t samstodin -n turso 'turso dev --db-file database.db --port 9797'
 
 # Customize the status bar for this session
 tmux set -t samstodin status-right ''
