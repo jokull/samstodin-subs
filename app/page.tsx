@@ -13,7 +13,7 @@ import { User } from "~/schema";
 import { ProfileForm } from "./_components/profile-form";
 import { Subscribe } from "./_components/subscribe";
 import { Subscription } from "./_components/subscription";
-import { getPlans, getSubscriptions } from "./queries";
+import { getSubscriptions } from "./queries";
 
 export default async function Page() {
   const email = await getSealedEmail(
@@ -69,7 +69,6 @@ export default async function Page() {
           <Subscription subscription={activeSubscription} />
         ) : (
           <Subscribe
-            plans={await getPlans()}
             activeButCancelledSubscription={activeButCancelledSubscription}
           />
         )}
