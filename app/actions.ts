@@ -13,6 +13,7 @@ export async function subscribe() {
     (await cookies()).get("__session")?.value ?? "",
   );
 
+
   if (user) {
     const redirectUrl = `https://askell.is/public/payments/118/?reference=${user.kennitala}`;
     // console.log(`[subscribe] User found: ${user.email}. Redirecting to: ${redirectUrl}`);
