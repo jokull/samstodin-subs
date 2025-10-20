@@ -15,7 +15,7 @@ export async function subscribe(planId: string) {
   const redirectUri = `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/`;
   if (user) {
     redirect(
-      `https://askell.is/subscribe-button/${planId}/?reference=${
+      `https://askell.is/payment-page/${planId}/?reference=${
         user.kennitala
       }&redirect=${encodeURIComponent(redirectUri)}`,
     );
