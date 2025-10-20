@@ -56,9 +56,7 @@ export default async function SettingsPage() {
             </p>
           </div>
           <div className="mt-5">
-            <HeroUploader
-              initialImageUrl={heroSetting?.value || null}
-            />
+            <HeroUploader initialImageUrl={heroSetting?.value || null} />
           </div>
         </div>
       </div>
