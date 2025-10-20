@@ -4,7 +4,6 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
 import { db } from "~/lib/db";
 import { getSession } from "~/lib/session";
 import { Settings } from "~/schema";

@@ -11,7 +11,9 @@ interface HeroUploaderProps {
   initialImageUrl: string | null;
 }
 
-export default function HeroUploader({ initialImageUrl }: HeroUploaderProps) {
+export default function HeroUploader({
+  initialImageUrl,
+}: HeroUploaderProps) {
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(
     initialImageUrl,
   );

@@ -21,11 +21,11 @@ export default [
   {
     ignores: [
       ".next/**",
-      "node_modules/**",
+      "node_modules/**", 
       "next.config.mjs",
       "postcss.config.mjs",
       "eslint.config.js",
-      "drizzle/**",
+      "drizzle/**"
     ],
   },
 ];
