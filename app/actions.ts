@@ -4,22 +4,25 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { env } from "~/env";
 import { askell } from "~/lib/api";
 import { getSession } from "~/lib/session";
 
-export async function subscribe(planId: string) {
+export async function subscribe() {
+  console.log("[subscribe] Action initiated.");
   const user = await getSession(
     (await cookies()).get("__session")?.value ?? "",
   );
-  const redirectUri = `https://${env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/`;
+
+
   if (user) {
-    redirect(
-      `https://askell.is/subscribe-button/${planId}/?reference=${
-        user.kennitala
-      }&redirect=${encodeURIComponent(redirectUri)}`,
-    );
+    const redirectUrl = `https://askell.is/public/payments/118/?reference=${user.kennitala}`;
+    // console.log(`[subscribe] User found: ${user.email}. Redirecting to: ${redirectUrl}`);
+    // Redirect to the dedicated Áskell payment page.
+    // The user will select their plan on this page.
+    redirect(redirectUrl);
   }
+
+  console.warn("[subscribe] No user session found. Redirecting to login.");
   redirect("/");
 }
 
