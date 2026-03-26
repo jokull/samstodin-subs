@@ -1,263 +1,45 @@
-import { and, count as countRows, desc, gte, lte } from "drizzle-orm";
+import { and, desc, gte, lte } from "drizzle-orm";
 import { getKennitalaBirthDate, parseKennitala } from "is-kennitala";
 import Link from "next/link";
 
 import { Pagination } from "~/components/Pagination";
-import { env } from "~/env";
+import { askell } from "~/lib/api";
 import { db } from "~/lib/db";
 import { User } from "~/schema";
-
-type UnknownRecord = Record<string, unknown>;
-
-type AdminBillingLog = {
-  amount: string | null;
-  state: string | null;
-};
-
-type AdminSubscription = {
-  active: boolean;
-  activeUntil: Date | null;
-  billingLogs: AdminBillingLog[];
-  cancelled: boolean;
-  customerId: number | string | null;
-  customerReference: string | null;
-  startDate: Date | null;
-};
-
-type ParsedSubscription = {
-  subscription: AdminSubscription;
-  warnings: string[];
-};
-
-function isRecord(value: unknown): value is UnknownRecord {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function toDate(value: unknown) {
-  if (value instanceof Date) {
-    return Number.isNaN(value.valueOf()) ? null : value;
-  }
-
-  if (typeof value !== "string" && typeof value !== "number") {
-    return null;
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? null : date;
-}
-
-function toString(value: unknown) {
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (typeof value === "number") {
-    return String(value);
-  }
-
-  return null;
-}
-
-function describeValue(value: unknown) {
-  if (value === undefined) {
-    return "undefined";
-  }
-
-  if (value === null) {
-    return "null";
-  }
-
-  if (Array.isArray(value)) {
-    return "array";
-  }
-
-  if (value instanceof Date) {
-    return "date";
-  }
-
-  return typeof value;
-}
-
-function parseSubscription(value: unknown) {
-  if (!isRecord(value)) {
-    return null;
-  }
-
-  const customer = isRecord(value.customer) ? value.customer : null;
-  const billingLogs = Array.isArray(value.billing_logs)
-    ? value.billing_logs.flatMap((entry) => {
-        if (!isRecord(entry)) {
-          return [];
-        }
-
-        const transaction = isRecord(entry.transaction) ? entry.transaction : null;
-        return [
-          {
-            amount: transaction ? toString(transaction.amount) : null,
-            state: transaction ? toString(transaction.state) : null,
-          } satisfies AdminBillingLog,
-        ];
-      })
-    : [];
-
-  const subscription = {
-    active: value.active === true,
-    activeUntil: toDate(value.active_until),
-    billingLogs,
-    cancelled: value.cancelled === true,
-    customerId:
-      customer && (typeof customer.id === "number" || typeof customer.id === "string")
-        ? customer.id
-        : null,
-    customerReference: customer ? toString(customer.customer_reference) : null,
-    startDate: toDate(value.start_date),
-  } satisfies AdminSubscription;
-
-  const warnings = [
-    !customer ? "customer missing or invalid" : null,
-    subscription.customerReference === null
-      ? "customer_reference missing or invalid"
-      : null,
-    typeof value.active !== "boolean"
-      ? `active normalized from ${describeValue(value.active)}`
-      : null,
-    typeof value.cancelled !== "boolean"
-      ? `cancelled normalized from ${describeValue(value.cancelled)}`
-      : null,
-    value.start_date === undefined
-      ? "start_date missing"
-      : subscription.startDate === null
-        ? `start_date normalized from ${describeValue(value.start_date)}`
-        : null,
-  ].filter((warning) => warning !== null);
-
-  return {
-    subscription,
-    warnings,
-  } satisfies ParsedSubscription;
-}
-
-async function getAdminSubscriptions(page: string, pageSize: number) {
-  const searchParams = new URLSearchParams({
-    ordering: "-start_date",
-    page,
-    page_size: pageSize.toString(),
-    type: "full",
-  });
-
-  try {
-    const response = await fetch(
-      `https://askell.is/api/subscriptions/?${searchParams.toString()}`,
-      {
-        cache: "no-store",
-        headers: { Authorization: `Api-Key ${env.ASKELL_PRIVATE}` },
-      },
-    );
-
-    if (!response.ok) {
-      const body = (await response.text()).slice(0, 500);
-      console.error("[admin] Askell subscriptions request failed", {
-        body,
-        page,
-        status: response.status,
-        statusText: response.statusText,
-      });
-
-      return {
-        count: 0,
-        error: "Ekki tókst að sækja áskriftargögn frá Áskelli.",
-        subscriptions: [],
-      };
-    }
-
-    const payload = (await response.json()) as unknown;
-    if (!isRecord(payload) || !Array.isArray(payload.results)) {
-      console.error("[admin] Unexpected Askell subscriptions payload", {
-        keys: isRecord(payload) ? Object.keys(payload) : [],
-        page,
-      });
-
-      return {
-        count: 0,
-        error: "Áskriftargögn frá Áskelli komu á óvæntu formi.",
-        subscriptions: [],
-      };
-    }
-
-    let invalidResults = 0;
-    const subscriptions = payload.results.flatMap((entry, index) => {
-      const parsed = parseSubscription(entry);
-      if (parsed) {
-        if (parsed.warnings.length > 0) {
-          console.warn("[admin] Askell subscription record normalized", {
-            index,
-            issues: parsed.warnings,
-            keys: isRecord(entry) ? Object.keys(entry) : [],
-            page,
-          });
-        }
-
-        return [parsed.subscription];
-      }
-
-      invalidResults += 1;
-      console.error("[admin] Dropping invalid Askell subscription record", {
-        index,
-        keys: isRecord(entry) ? Object.keys(entry) : [],
-        page,
-      });
-      return [];
-    });
-
-    if (invalidResults > 0) {
-      console.error("[admin] Askell subscriptions contained invalid records", {
-        invalidResults,
-        page,
-        returnedResults: payload.results.length,
-      });
-    }
-
-    return {
-      count: typeof payload.count === "number" ? payload.count : 0,
-      error: null,
-      subscriptions,
-    };
-  } catch (error) {
-    console.error("[admin] Failed to load Askell subscriptions", {
-      error,
-      page,
-    });
-
-    return {
-      count: 0,
-      error: "Ekki tókst að sækja áskriftargögn frá Áskelli.",
-      subscriptions: [],
-    };
-  }
-}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string, string>>;
 }) {
   const searchParams = await props.searchParams;
   const page = searchParams.page ?? "1";
-  const parsedPage = Number.parseInt(page, 10);
-  const pageNumber = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
   const pageSize = 50;
 
-  const { count, error, subscriptions } = await getAdminSubscriptions(
-    page,
-    pageSize,
+  const { count, results } = await askell.get("/subscriptions/", {
+    queries: {
+      type: "full",
+      page,
+      page_size: pageSize.toString(),
+      ordering: "-start_date",
+    },
+  });
+
+  const subscriptions = results.flatMap(({ customer, ...sub }) =>
+    customer && typeof customer === "object" ? [{ customer, ...sub }] : [],
   );
 
+  // Use reduce to find the min and max dates
   const { minDate, maxDate } = subscriptions.reduce(
     (acc: { minDate: Date | null; maxDate: Date | null }, subscription) => {
-      if (subscription.startDate) {
-        if (!acc.minDate || subscription.startDate < acc.minDate) {
-          acc.minDate = subscription.startDate;
+      const { start_date } = subscription;
+
+      if (start_date) {
+        const startDate = new Date(start_date);
+
+        if (!acc.minDate || startDate < acc.minDate) {
+          acc.minDate = startDate;
         }
-        if (!acc.maxDate || subscription.startDate > acc.maxDate) {
-          acc.maxDate = subscription.startDate;
+        if (!acc.maxDate || startDate > acc.maxDate) {
+          acc.maxDate = startDate;
         }
       }
       return acc;
@@ -265,44 +47,26 @@ export default async function Page(props: {
     { minDate: null, maxDate: null },
   );
 
-  const useUnfilteredUsers = !minDate || !maxDate;
-  const [users, totalCount] = useUnfilteredUsers
-    ? await Promise.all([
-        db.query.User.findMany({
-          limit: pageSize,
-          offset: (pageNumber - 1) * pageSize,
-          orderBy: desc(User.createdAt),
-        }),
-        db
-          .select({ count: countRows() })
-          .from(User)
-          .then((rows) => rows[0]!.count),
-      ])
-    : await Promise.all([
-        db.query.User.findMany({
-          where: and(
+  const users = await db.query.User.findMany({
+    where:
+      minDate && maxDate
+        ? and(
             gte(User.createdAt, minDate),
-            lte(User.createdAt, pageNumber === 1 ? new Date() : maxDate),
-          ),
-          orderBy: desc(User.createdAt),
-        }),
-        Promise.resolve(count),
-      ]);
+            lte(User.createdAt, page === "1" ? new Date() : maxDate),
+          )
+        : undefined,
+    orderBy: desc(User.createdAt),
+  });
 
   const subscriptionUsers = users.map((user) => {
     const subscription = subscriptions.find(
-      ({ customerReference }) => customerReference === user.kennitala,
+      ({ customer }) => customer.customer_reference === user.kennitala,
     );
     return { subscription, user };
   });
 
   return (
     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-      {error ? (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {error}
-        </div>
-      ) : null}
       <table className="min-w-full divide-y divide-gray-300">
         <thead>
           <tr>
@@ -358,31 +122,16 @@ export default async function Page(props: {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {subscriptionUsers?.map(({ user, subscription }) => {
-            const billingLogs = subscription?.billingLogs ?? [];
+            const billingLogs = subscription?.billing_logs ?? [];
             const settledTransactions = billingLogs.filter(
-              ({ state }) => state === "settled",
+              ({ transaction }) => transaction?.state === "settled",
             );
 
-            const createdAt = subscription?.startDate ?? user.createdAt;
+            const createdAt = subscription?.start_date
+              ? new Date(subscription.start_date)
+              : user.createdAt;
 
             const kennitala = parseKennitala(user.kennitala);
-            const status =
-              subscription?.cancelled && subscription.activeUntil
-                ? `${subscription.active ? "Rennur" : "Rann"} út ${subscription.activeUntil.toLocaleDateString(
-                    "is-IS",
-                    {
-                      day: "numeric",
-                      month: "numeric",
-                      year: "numeric",
-                    },
-                  )}`
-                : subscription?.cancelled
-                  ? subscription.active
-                    ? "Rennur út"
-                    : "Rann út"
-                  : subscription?.active
-                    ? "Virk"
-                    : "Óvirk";
 
             return (
               <tr key={user.id}>
@@ -401,8 +150,9 @@ export default async function Page(props: {
                     : undefined}
                 </td>
                 <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                  {settledTransactions[0]?.amount
-                    ? settledTransactions[0].amount.split(".")[0] + " kr."
+                  {settledTransactions[0]?.transaction?.amount
+                    ? settledTransactions[0]?.transaction.amount.split(".")[0] +
+                      " kr."
                     : null}
                 </td>
                 <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
@@ -414,17 +164,24 @@ export default async function Page(props: {
                   }`}
                 >
                   {subscription ? (
-                    subscription.customerId ? (
-                      <Link
-                        target="_blank"
-                        className="underline"
-                        href={`https://askell.is/dashboard/customers/${subscription.customerId}/`}
-                      >
-                        {status}
-                      </Link>
-                    ) : (
-                      <span>{status}</span>
-                    )
+                    <Link
+                      target="_blank"
+                      className="underline"
+                      href={`https://askell.is/dashboard/customers/${subscription.customer.id}/`}
+                    >
+                      {subscription.cancelled
+                        ? `${subscription.active ? "Rennur" : "Rann"} út ${subscription.active_until?.toLocaleDateString(
+                            "is-IS",
+                            {
+                              year: "numeric",
+                              month: "numeric",
+                              day: "numeric",
+                            },
+                          )}`
+                        : subscription.active
+                          ? "Virk"
+                          : "Óvirk"}
+                    </Link>
                   ) : (
                     <span>Óskráður</span>
                   )}
@@ -438,8 +195,8 @@ export default async function Page(props: {
         </tbody>
       </table>
       <Pagination
-        page={pageNumber}
-        totalPages={Math.ceil(totalCount / pageSize)}
+        page={parseInt(page, 10)}
+        totalPages={Math.ceil(count / pageSize)}
       />
     </div>
   );
