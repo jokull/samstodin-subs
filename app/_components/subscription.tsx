@@ -5,12 +5,18 @@ import { useTransition } from "react";
 import { unsubscribe } from "../actions";
 import { Subscription as SubscriptionType } from "../queries";
 
+function formatDate(date: Date) {
+  return date.toLocaleDateString("is-IS", { dateStyle: "long" });
+}
+
 export function Subscription({
   subscription,
 }: {
   subscription: SubscriptionType;
 }) {
   const [isPending, startTransition] = useTransition();
+  const isPaused = subscription.state === "paused";
+
   return (
     <>
       <div className="mb-8 space-y-4">
@@ -26,15 +32,20 @@ export function Subscription({
         </p>
       </div>
       <div className="mb-8 space-y-4">
-        <p className="font-bold">Þú ert með áskrift að Samstöðinni.</p>
-        {subscription.active_until ? (
+        <p className="font-bold">
+          {isPaused
+            ? "Áskriftin þín að Samstöðinni er í bið."
+            : "Þú ert með áskrift að Samstöðinni."}
+        </p>
+        {subscription.isCancelled && subscription.activeUntil ? (
           <p>
-            {subscription.ended_at
-              ? "Áskriftinni hefur verið hætt og rennur hún út"
-              : "Áskriftin verður næst endurnýjuð sjálfkrafa"}{" "}
-            {subscription.active_until.toLocaleDateString("is-IS", {
-              dateStyle: "long",
-            })}
+            Áskriftinni hefur verið hætt og rennur hún út{" "}
+            {formatDate(subscription.activeUntil)}
+          </p>
+        ) : subscription.nextBillingAt ? (
+          <p>
+            Áskriftin verður næst endurnýjuð sjálfkrafa{" "}
+            {formatDate(subscription.nextBillingAt)}
           </p>
         ) : null}
         <p className="mb-8">
@@ -42,26 +53,26 @@ export function Subscription({
           svo aftur.
         </p>
         <div>
-          <a
-            className="underline"
-            target="_blank"
-            href={`https://askell.is/change_subscription/${
-              subscription.token ?? ""
-            }`}
-            rel="noreferrer"
-          >
-            Uppfæra greiðslumáta
-          </a>{" "}
-          eða{" "}
+          {subscription.managementUrl ? (
+            <>
+              <a
+                className="underline"
+                target="_blank"
+                href={subscription.managementUrl}
+                rel="noreferrer"
+              >
+                Uppfæra greiðslumáta
+              </a>{" "}
+              eða{" "}
+            </>
+          ) : null}
           <button
             className="underline disabled:opacity-50"
             disabled={isPending}
             onClick={(event) => {
               event.preventDefault();
               startTransition(() => {
-                if (subscription.id) {
-                  void unsubscribe(subscription.id.toString());
-                }
+                void unsubscribe(subscription.id, subscription.source);
               });
             }}
           >
