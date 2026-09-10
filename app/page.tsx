@@ -1,10 +1,8 @@
-import { isErrorFromPath } from "@zodios/core";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { Header } from "~/components/Header";
-import { askell } from "~/lib/api";
 import { db } from "~/lib/db";
 import { getSealedEmail } from "~/lib/session";
 import { normalizeEmail } from "~/lib/utils";
@@ -31,31 +29,25 @@ export default async function Page() {
     : null;
 
   const subscriptions = user
-    ? await getSubscriptions(user).catch((error) => {
-        if (
-          isErrorFromPath(
-            askell.api,
-            "get",
-            "/customers/:customerReference/subscriptions/",
-            error,
-          )
-        ) {
-          return [];
-        }
-        console.error(error);
+    ? await getSubscriptions(user).catch((error: unknown) => {
+        console.error("[page] Failed to load Askell subscriptions", error);
         return [];
       })
     : [];
 
   const activeSubscription = subscriptions.find(
-    (subscription) =>
-      subscription.active === true && subscription.cancelled === false,
+    (subscription) => subscription.isActive && !subscription.isCancelled,
+  );
+
+  const pausedSubscription = subscriptions.find(
+    (subscription) => subscription.state === "paused",
   );
 
   const activeButCancelledSubscription = subscriptions.find(
-    (subscription) =>
-      subscription.active === true && subscription.cancelled === true,
+    (subscription) => subscription.isActive && subscription.isCancelled,
   );
+
+  const currentSubscription = activeSubscription ?? pausedSubscription;
 
   return (
     <div className="mx-auto flex h-full min-h-screen max-w-2xl flex-col">
@@ -65,8 +57,8 @@ export default async function Page() {
       <main className="h-full bg-white p-4">
         {!user ? (
           <ProfileForm />
-        ) : activeSubscription ? (
-          <Subscription subscription={activeSubscription} />
+        ) : currentSubscription ? (
+          <Subscription subscription={currentSubscription} />
         ) : (
           <Subscribe
             activeButCancelledSubscription={activeButCancelledSubscription}

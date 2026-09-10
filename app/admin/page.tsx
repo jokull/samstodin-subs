@@ -4,20 +4,21 @@ import Link from "next/link";
 
 import { Pagination } from "~/components/Pagination";
 import { env } from "~/env";
+import {
+  getAllSubscriptionContracts,
+  getContractAmount,
+  getContractStatus,
+} from "~/lib/askell-v2";
 import { db } from "~/lib/db";
 import { User } from "~/schema";
 
 type UnknownRecord = Record<string, unknown>;
 
-type AdminBillingLog = {
-  amount: string | null;
-  state: string | null;
-};
-
 type AdminSubscription = {
   active: boolean;
   activeUntil: Date | null;
-  billingLogs: AdminBillingLog[];
+  /** Recurring amount in ISK, when known. */
+  amount: number | null;
   cancelled: boolean;
   customerId: number | string | null;
   customerReference: string | null;
@@ -84,29 +85,30 @@ function parseSubscription(value: unknown) {
   }
 
   const customer = isRecord(value.customer) ? value.customer : null;
-  const billingLogs = Array.isArray(value.billing_logs)
-    ? value.billing_logs.flatMap((entry) => {
-        if (!isRecord(entry)) {
-          return [];
+  const settledAmount = Array.isArray(value.billing_logs)
+    ? value.billing_logs.reduce<number | null>((found, entry) => {
+        if (found !== null || !isRecord(entry)) {
+          return found;
         }
-
-        const transaction = isRecord(entry.transaction) ? entry.transaction : null;
-        return [
-          {
-            amount: transaction ? toString(transaction.amount) : null,
-            state: transaction ? toString(transaction.state) : null,
-          } satisfies AdminBillingLog,
-        ];
-      })
-    : [];
+        const transaction = isRecord(entry.transaction)
+          ? entry.transaction
+          : null;
+        if (!transaction || toString(transaction.state) !== "settled") {
+          return found;
+        }
+        const amount = Number(toString(transaction.amount));
+        return Number.isNaN(amount) ? found : amount;
+      }, null)
+    : null;
 
   const subscription = {
     active: value.active === true,
     activeUntil: toDate(value.active_until),
-    billingLogs,
+    amount: settledAmount,
     cancelled: value.cancelled === true,
     customerId:
-      customer && (typeof customer.id === "number" || typeof customer.id === "string")
+      customer &&
+      (typeof customer.id === "number" || typeof customer.id === "string")
         ? customer.id
         : null,
     customerReference: customer ? toString(customer.customer_reference) : null,
@@ -137,7 +139,39 @@ function parseSubscription(value: unknown) {
   } satisfies ParsedSubscription;
 }
 
-async function getAdminSubscriptions(page: string, pageSize: number) {
+/**
+ * Reads every v2 subscription contract and maps it onto the admin table shape.
+ *
+ * The v2 list endpoint documents no ordering parameter, so all contracts are
+ * pulled and sorted here. Payment amounts are not part of the contract payload
+ * and are loaded per contract later, for the rows actually rendered.
+ */
+async function getContractSubscriptions() {
+  const contracts = await getAllSubscriptionContracts();
+  const now = new Date();
+
+  const subscriptions = contracts.map((contract) => {
+    const { endsAt, isActive, isCancelled } = getContractStatus(contract, now);
+
+    return {
+      active: isActive,
+      activeUntil: endsAt,
+      amount: getContractAmount(contract),
+      cancelled: isCancelled,
+      customerId: contract.customer_id ?? null,
+      customerReference: contract.customer_reference ?? null,
+      startDate: contract.billing_anchor_at ?? contract.created_at,
+    } satisfies AdminSubscription;
+  });
+
+  subscriptions.sort(
+    (a, b) => (b.startDate?.valueOf() ?? 0) - (a.startDate?.valueOf() ?? 0),
+  );
+
+  return subscriptions;
+}
+
+async function getLegacyAdminSubscriptions(page: string, pageSize: number) {
   const searchParams = new URLSearchParams({
     ordering: "-start_date",
     page,
@@ -236,16 +270,45 @@ async function getAdminSubscriptions(page: string, pageSize: number) {
   }
 }
 
+/**
+ * Subscription data for the admin table.
+ *
+ * Samstöðin was migrated to v2 subscription contracts, so contracts are the
+ * source of truth. The legacy subscriptions list is used only if the v2
+ * request fails or returns nothing.
+ */
+async function getAdminSubscriptions(page: string, pageSize: number) {
+  try {
+    const subscriptions = await getContractSubscriptions();
+    if (subscriptions.length > 0) {
+      return {
+        count: subscriptions.length,
+        error: null,
+        source: "contract" as const,
+        subscriptions,
+      };
+    }
+  } catch (error) {
+    console.error("[admin] Failed to load Askell v2 contracts", { error });
+  }
+
+  return {
+    ...(await getLegacyAdminSubscriptions(page, pageSize)),
+    source: "legacy" as const,
+  };
+}
+
 export default async function Page(props: {
   searchParams: Promise<Record<string, string>>;
 }) {
   const searchParams = await props.searchParams;
   const page = searchParams.page ?? "1";
   const parsedPage = Number.parseInt(page, 10);
-  const pageNumber = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+  const pageNumber =
+    Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
   const pageSize = 50;
 
-  const { count, error, subscriptions } = await getAdminSubscriptions(
+  const { count, error, source, subscriptions } = await getAdminSubscriptions(
     page,
     pageSize,
   );
@@ -265,7 +328,7 @@ export default async function Page(props: {
     { minDate: null, maxDate: null },
   );
 
-  const useUnfilteredUsers = !minDate || !maxDate;
+  const useUnfilteredUsers = source === "contract" || !minDate || !maxDate;
   const [users, totalCount] = useUnfilteredUsers
     ? await Promise.all([
         db.query.User.findMany({
@@ -358,11 +421,6 @@ export default async function Page(props: {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {subscriptionUsers?.map(({ user, subscription }) => {
-            const billingLogs = subscription?.billingLogs ?? [];
-            const settledTransactions = billingLogs.filter(
-              ({ state }) => state === "settled",
-            );
-
             const createdAt = subscription?.startDate ?? user.createdAt;
 
             const kennitala = parseKennitala(user.kennitala);
@@ -401,8 +459,10 @@ export default async function Page(props: {
                     : undefined}
                 </td>
                 <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                  {settledTransactions[0]?.amount
-                    ? settledTransactions[0].amount.split(".")[0] + " kr."
+                  {subscription?.amount != null
+                    ? `${subscription.amount.toLocaleString("is-IS", {
+                        maximumFractionDigits: 0,
+                      })} kr.`
                     : null}
                 </td>
                 <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
