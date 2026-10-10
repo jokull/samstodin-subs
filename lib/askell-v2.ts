@@ -285,10 +285,16 @@ const CONTRACT_PAGE_SIZE = 1000;
  * Fetches every subscription contract, following pagination.
  *
  * The v2 list endpoint documents no ordering parameter, so callers that need
- * a specific order have to sort the result themselves.
+ * a specific order have to sort the result themselves. The full list is slow
+ * to load, so callers can pass a `signal` to bound how long they wait.
  */
-export async function getAllSubscriptionContracts(maxPages = 20) {
+export async function getAllSubscriptionContracts({
+  maxPages = 20,
+  signal,
+}: { maxPages?: number; signal?: AbortSignal } = {}) {
   const contracts: SubscriptionContract[] = [];
+  const startedAt = Date.now();
+  let pages = 0;
 
   for (let page = 1; page <= maxPages; page++) {
     const searchParams = new URLSearchParams({
@@ -297,10 +303,12 @@ export async function getAllSubscriptionContracts(maxPages = 20) {
     });
     const payload = await askellV2Fetch(
       `/subscription-contracts/?${searchParams.toString()}`,
+      { signal },
     );
     const parsed = contractListSchema.parse(payload);
     const results = Array.isArray(parsed) ? parsed : parsed.results;
     contracts.push(...results);
+    pages = page;
 
     const hasNextPage =
       !Array.isArray(parsed) && typeof parsed.next === "string";
@@ -308,6 +316,12 @@ export async function getAllSubscriptionContracts(maxPages = 20) {
       break;
     }
   }
+
+  console.info("[askell-v2] Loaded all subscription contracts", {
+    contracts: contracts.length,
+    durationMs: Date.now() - startedAt,
+    pages,
+  });
 
   return contracts;
 }

@@ -1,6 +1,12 @@
+import { promisify } from "node:util";
+import { gunzip, gzip } from "node:zlib";
+
 import { and, count as countRows, desc, gte, lte } from "drizzle-orm";
 import { getKennitalaBirthDate, parseKennitala } from "is-kennitala";
+import { unstable_cache } from "next/cache";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { Pagination } from "~/components/Pagination";
 import { env } from "~/env";
@@ -8,9 +14,26 @@ import {
   getAllSubscriptionContracts,
   getContractAmount,
   getContractStatus,
+  subscriptionContractSchema,
 } from "~/lib/askell-v2";
 import { db } from "~/lib/db";
+import { getSession } from "~/lib/session";
 import { User } from "~/schema";
+
+/**
+ * Loading the full contract list from Áskell takes several seconds, which
+ * leaves too little headroom under Vercel's default function time limit.
+ */
+export const maxDuration = 60;
+
+/** How long to wait for Áskell's contract list before falling back. */
+const CONTRACTS_TIMEOUT_MS = 40_000;
+
+/** Length of each window in which one cached contract list is shared. */
+const CONTRACTS_CACHE_SECONDS = 5 * 60;
+
+const gzipAsync = promisify(gzip);
+const gunzipAsync = promisify(gunzip);
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -139,15 +162,73 @@ function parseSubscription(value: unknown) {
   } satisfies ParsedSubscription;
 }
 
+function toIsoString(date: Date | null) {
+  return date?.toISOString() ?? null;
+}
+
+/**
+ * Every v2 subscription contract, shared across requests within one cache
+ * window so that page loads and pagination do not each wait on Áskell for the
+ * full list.
+ *
+ * `slot` numbers the window and is part of the cache key, so the first request
+ * in a new window fetches a fresh list. Entries outlive their window, so Next
+ * never serves one stale while revalidating in the background, which would
+ * show data of any age to the first visitor after a quiet period.
+ *
+ * Only the fields the table reads are kept, with dates as ISO strings. The
+ * JSON is gzipped and base64-encoded so full lists fit the cache's 2 MB item
+ * limit. Callers decompress it and parse through `subscriptionContractSchema`.
+ */
+const getCachedContracts = unstable_cache(
+  // `slot` is only read by unstable_cache, as part of the cache key.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (slot: number) => {
+    const contracts = await getAllSubscriptionContracts({
+      signal: AbortSignal.timeout(CONTRACTS_TIMEOUT_MS),
+    });
+
+    const compactContracts = contracts.map((contract) => ({
+      billing_anchor_at: toIsoString(contract.billing_anchor_at),
+      cancel_at: toIsoString(contract.cancel_at),
+      cancel_at_period_end: contract.cancel_at_period_end,
+      canceled_at: toIsoString(contract.canceled_at),
+      created_at: toIsoString(contract.created_at),
+      customer_id: contract.customer_id,
+      customer_reference: contract.customer_reference,
+      ended_at: toIsoString(contract.ended_at),
+      id: contract.id,
+      items: contract.items?.map((item) => ({
+        price: item.price ? { unit_amount: item.price.unit_amount } : null,
+        quantity: item.quantity,
+        unit_amount_override: item.unit_amount_override,
+      })),
+      next_billing_at: toIsoString(contract.next_billing_at),
+      state: contract.state,
+    }));
+
+    return (await gzipAsync(JSON.stringify(compactContracts))).toString(
+      "base64",
+    );
+  },
+  ["admin-subscription-contracts-gzip-v1"],
+  { revalidate: CONTRACTS_CACHE_SECONDS * 2 },
+);
+
 /**
  * Reads every v2 subscription contract and maps it onto the admin table shape.
  *
  * The v2 list endpoint documents no ordering parameter, so all contracts are
- * pulled and sorted here. Payment amounts are not part of the contract payload
- * and are loaded per contract later, for the rows actually rendered.
+ * pulled and sorted here. Status is derived on each request, so a contract
+ * that lapses while the list is cached still shows as ended.
  */
 async function getContractSubscriptions() {
-  const contracts = await getAllSubscriptionContracts();
+  const slot = Math.floor(Date.now() / (CONTRACTS_CACHE_SECONDS * 1000));
+  const cached = await getCachedContracts(slot);
+  const json = await gunzipAsync(Buffer.from(cached, "base64"));
+  const contracts = subscriptionContractSchema
+    .array()
+    .parse(JSON.parse(json.toString("utf8")) as unknown);
   const now = new Date();
 
   const subscriptions = contracts.map((contract) => {
@@ -199,7 +280,7 @@ async function getLegacyAdminSubscriptions(page: string, pageSize: number) {
 
       return {
         count: 0,
-        error: "Ekki tókst að sækja áskriftargögn frá Áskelli.",
+        error: "Ekki tókst að sækja áskriftargögn frá Áskeli.",
         subscriptions: [],
       };
     }
@@ -213,7 +294,7 @@ async function getLegacyAdminSubscriptions(page: string, pageSize: number) {
 
       return {
         count: 0,
-        error: "Áskriftargögn frá Áskelli komu á óvæntu formi.",
+        error: "Áskriftargögn frá Áskeli komu á óvæntu formi.",
         subscriptions: [],
       };
     }
@@ -264,7 +345,7 @@ async function getLegacyAdminSubscriptions(page: string, pageSize: number) {
 
     return {
       count: 0,
-      error: "Ekki tókst að sækja áskriftargögn frá Áskelli.",
+      error: "Ekki tókst að sækja áskriftargögn frá Áskeli.",
       subscriptions: [],
     };
   }
@@ -278,6 +359,8 @@ async function getLegacyAdminSubscriptions(page: string, pageSize: number) {
  * request fails or returns nothing.
  */
 async function getAdminSubscriptions(page: string, pageSize: number) {
+  let contractsFailed = false;
+
   try {
     const subscriptions = await getContractSubscriptions();
     if (subscriptions.length > 0) {
@@ -289,11 +372,21 @@ async function getAdminSubscriptions(page: string, pageSize: number) {
       };
     }
   } catch (error) {
+    contractsFailed = true;
     console.error("[admin] Failed to load Askell v2 contracts", { error });
   }
 
+  const legacy = await getLegacyAdminSubscriptions(page, pageSize);
+
   return {
-    ...(await getLegacyAdminSubscriptions(page, pageSize)),
+    ...legacy,
+    // Legacy records stopped updating after the v2 migration, so say so
+    // rather than silently showing statuses that may be out of date.
+    error:
+      legacy.error ??
+      (contractsFailed
+        ? "Ekki tókst að sækja nýjustu áskriftargögnin frá Áskeli, svo staðan hér gæti verið úrelt."
+        : null),
     source: "legacy" as const,
   };
 }
@@ -301,6 +394,16 @@ async function getAdminSubscriptions(page: string, pageSize: number) {
 export default async function Page(props: {
   searchParams: Promise<Record<string, string>>;
 }) {
+  // The layout checks this too, but Next renders the layout and page in
+  // parallel, so without it every logged-out request would still pull the
+  // full contract list from Áskell before being redirected.
+  const user = await getSession(
+    (await cookies()).get("__session")?.value ?? "",
+  );
+  if (!user?.isAdmin) {
+    redirect(`/login?redirect=${encodeURIComponent("/admin")}`);
+  }
+
   const searchParams = await props.searchParams;
   const page = searchParams.page ?? "1";
   const parsedPage = Number.parseInt(page, 10);
